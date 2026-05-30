@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Failmate // Gravedigger Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="bg-background scanlines">
+  <header class="fixed top-0 z-50 w-full h-16 flex justify-between items-center px-4 md:px-margin-desktop bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2"><img src="assets/logo.svg" class="h-9 w-9" alt="" /><span class="text-headline-md font-black text-primary-container uppercase">Failmate</span></a>
+      <nav class="hidden md:flex gap-6 ml-4 text-label-caps">
+        <span class="text-primary font-bold border-b-2 border-primary h-16 flex items-center">GRAVEDIGGER</span>
+        <a href="leaderboard.html" class="text-on-surface-variant h-16 flex items-center hover:text-primary">LEADERBOARD</a>
+      </nav>
+    </div>
+    <div class="text-right flex items-center gap-3">
+      <a id="auth-login-link" href="login.html" class="text-label-caps text-[10px] text-on-surface-variant hover:text-primary">LOGIN</a>
+      <button type="button" id="auth-logout-btn" class="hidden text-label-caps text-[10px] text-on-surface-variant hover:text-primary">LOGOUT</button>
+      <div>
+      <p class="text-data-sm text-primary" id="dash-user">GUEST</p>
+      <p class="text-[10px] font-label-caps text-on-surface-variant">ELITE EXCAVATOR</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex pt-16 min-h-screen pb-16">
+    <aside class="hidden md:flex w-64 flex-col border-r border-outline-variant/20 bg-surface-container-low/90 py-gutter shrink-0">
+      <nav class="space-y-1 px-2">
+        <a href="index.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">curtains_closed</span><span class="text-label-caps">GRAVEYARD</span></a>
+        <a href="lab.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">science</span><span class="text-label-caps">REANIMATION_LAB</span></a>
+      </nav>
+      <div class="px-4 mt-8"><a href="bury.html" class="block w-full py-2 text-center border border-primary/40 text-primary text-label-caps hover:bg-primary hover:text-on-primary">&gt; BURY_PROJECT</a></div>
+    </aside>
+
+    <main class="flex-grow md:ml-64 p-4 md:p-gutter max-w-[1400px] mx-auto relative z-20">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="glass-panel p-6 rounded-lg">
+          <p class="text-label-caps text-on-surface-variant mb-2">KARMA_REPUTATION</p>
+          <h3 class="text-headline-lg text-primary terminal-glow" id="karma">12,840</h3>
+          <div class="mt-4 h-1 bg-surface-container-high rounded overflow-hidden"><div class="h-full bg-primary-container w-[72%]"></div></div>
+        </div>
+        <div class="glass-panel p-6 rounded-lg">
+          <p class="text-label-caps text-on-surface-variant mb-2">TOTAL_BURIALS</p>
+          <h3 class="text-headline-lg text-secondary" id="burials">142</h3>
+        </div>
+        <div class="glass-panel p-6 rounded-lg">
+          <p class="text-label-caps text-on-surface-variant mb-2">CLAIMS_FILED</p>
+          <h3 class="text-headline-lg text-primary-fixed-dim" id="claims-count">0</h3>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 space-y-6">
+          <section class="glass-panel rounded-lg border-l-4 border-primary p-6">
+            <h2 class="text-headline-md text-primary mb-2">PROJECT_REANIMATION</h2>
+            <p class="text-data-sm text-on-surface-variant mb-4">Active Code Resurrection: Hydra-Engine-Core</p>
+            <div class="bg-surface-container-lowest border border-outline-variant/30 p-4 rounded">
+              <div class="flex justify-between text-data-sm text-primary mb-2"><span>SYNTAX_CHECK</span><span>78%</span></div>
+              <div class="flex gap-[2px] h-6" id="syntax-bar"></div>
+            </div>
+          </section>
+          <section>
+            <h2 class="text-label-caps text-primary mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">history</span> PERSONAL_BURIAL_GROUND</h2>
+            <div id="personal-graves" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </section>
+        </div>
+        <div class="lg:col-span-4">
+          <section class="glass-panel rounded-lg flex flex-col max-h-[600px]">
+            <div class="p-4 border-b border-outline-variant/30 flex justify-between">
+              <h2 class="text-label-caps text-primary">TERMINAL_FEED</h2>
+              <span class="flex items-center gap-2 text-[10px] font-label-caps text-primary"><span class="w-2 h-2 bg-primary-container rounded-full animate-pulse"></span> LIVE</span>
+            </div>
+            <div id="terminal-feed" class="overflow-y-auto flex-grow zebra-list"></div>
+            <div class="p-4 bg-surface-container-lowest/50">
+              <span class="text-data-sm text-primary">root@failmate:~$</span><span class="w-2 h-4 bg-primary cursor-blink inline-block ml-1 align-middle"></span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="bg-surface-container-lowest border-t border-outline-variant/10 py-4 px-4 md:px-margin-desktop text-label-caps text-primary">
+    FAILMATE TERMINAL // DEATH_TOLL: <span data-death-toll>42,069</span>
+  </footer>
+
+  <style>.terminal-glow { text-shadow: 0 0 5px rgba(0,255,65,0.5); }</style>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/firestore-db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app-init.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

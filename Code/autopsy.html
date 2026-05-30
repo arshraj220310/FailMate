@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAILMATE // AUTOPSY_LOG</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="text-on-surface bg-surface-container-lowest">
+  <div class="scanline-overlay fixed inset-0 opacity-30 pointer-events-none z-50"></div>
+
+  <header class="fixed top-0 z-40 w-full h-16 glass-panel border-b border-outline-variant/30 flex justify-between items-center px-4 md:px-margin-desktop">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/logo.svg" alt="" class="h-8 w-8" />
+        <span class="text-headline-md font-black text-primary-container uppercase">Failmate</span>
+      </a>
+      <div class="h-4 w-px bg-outline-variant/30 hidden md:block"></div>
+      <span id="system-log" class="text-data-sm text-primary-container/60 hidden md:block uppercase tracking-widest">System_Log://autopsy</span>
+    </div>
+    <a href="dashboard.html" class="text-label-caps text-primary-container border border-primary-container/20 px-3 py-1 glass-panel hover:bg-primary/10">Profile</a>
+    <a id="auth-login-link" href="login.html" class="text-label-caps text-[10px] text-on-surface-variant hover:text-primary ml-2">LOGIN</a>
+  </header>
+
+  <div class="flex pt-16 min-h-screen pb-8">
+    <aside class="w-64 border-r border-outline-variant/20 hidden md:flex flex-col bg-surface-container-low/90 shrink-0">
+      <nav class="p-gutter space-y-1">
+        <a href="index.html" class="text-on-surface-variant py-3 px-4 flex items-center gap-3 opacity-70 hover:bg-surface-variant/50"><span class="material-symbols-outlined">curtains_closed</span><span class="text-label-caps">GRAVEYARD</span></a>
+        <span class="text-primary-container bg-primary/5 border-l-4 border-primary-container py-3 px-4 flex items-center gap-3"><span class="material-symbols-outlined">biotech</span><span class="text-label-caps">AUTOPSY_LOGS</span></span>
+        <a href="lab.html" class="text-on-surface-variant py-3 px-4 flex items-center gap-3 opacity-70 hover:bg-surface-variant/50"><span class="material-symbols-outlined">science</span><span class="text-label-caps">REANIMATION_LAB</span></a>
+      </nav>
+      <div class="p-gutter"><a href="bury.html" class="block w-full py-3 text-center border border-primary-container text-primary-container text-label-caps hover:bg-primary-container hover:text-on-primary">&gt; BURY_PROJECT</a></div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-6 md:p-margin-desktop">
+      <div id="autopsy-root" class="max-w-container-max mx-auto space-y-8"></div>
+      <div id="not-found" class="hidden text-center py-20">
+        <p class="text-headline-md text-error mb-4">CORPSE NOT FOUND</p>
+        <a href="index.html" class="text-primary font-label-caps underline">Return to graveyard</a>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-8 right-4 z-[100] glass-panel border-primary-container/40 px-4 py-3">
+    <p class="text-data-sm text-primary"><span id="toast-message"></span></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/firestore-db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app-init.js"></script>
+  <script src="js/autopsy.js"></script>
+</body>
+</html>

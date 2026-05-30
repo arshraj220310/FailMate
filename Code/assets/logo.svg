@@ -1,0 +1,6 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="Failmate logo">
+  <rect width="200" height="200" fill="#000000"/>
+  <path d="M40 160V40H160V70H70V90H140V120H70V160H40Z" fill="#00FF41"/>
+  <rect x="150" y="140" width="20" height="20" fill="#00FF41"/>
+  <text x="40" y="190" font-family="JetBrains Mono, monospace" font-weight="bold" font-size="24" fill="#00FF41">FAILMATE</text>
+</svg>

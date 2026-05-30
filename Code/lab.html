@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAILMATE // REPOSITORY_ANALYSIS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+  <header class="fixed top-0 w-full h-16 bg-surface/80 backdrop-blur-md flex justify-between items-center px-4 md:px-margin-desktop border-b border-outline-variant/30 z-50">
+    <a href="index.html" class="flex items-center gap-3"><img src="assets/logo.svg" class="h-9 w-9" alt="" /><span class="text-headline-md font-black text-primary-container uppercase">Failmate</span></a>
+    <div class="flex gap-4">
+      <button type="button" id="notif-bell" class="material-symbols-outlined text-on-surface-variant hover:text-primary">notifications</button>
+      <a href="dashboard.html" class="material-symbols-outlined text-on-surface-variant hover:text-primary">terminal</a>
+    </div>
+  </header>
+
+  <div class="flex flex-1 pt-16">
+    <aside class="hidden md:flex w-64 flex-col border-r border-outline-variant/20 bg-surface-container-low/90 py-gutter shrink-0 fixed left-0 h-full">
+      <nav class="px-2 space-y-1">
+        <a href="index.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">curtains_closed</span><span class="text-label-caps">GRAVEYARD</span></a>
+        <a href="autopsy.html?id=neuralnet-social" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">biotech</span><span class="text-label-caps">AUTOPSY_LOGS</span></a>
+        <a href="lab.html" class="text-primary-container bg-primary/5 border-l-4 border-primary-container py-3 px-4 flex gap-3 items-center"><span class="material-symbols-outlined">science</span><span class="text-label-caps">REANIMATION_LAB</span></a>
+      </nav>
+      <div class="px-4 mt-8"><a href="bury.html" class="block w-full py-4 text-center border border-primary-container text-primary-container text-label-caps hover:bg-primary-container hover:text-on-primary">&gt; BURY_PROJECT</a></div>
+    </aside>
+
+    <main class="flex-1 md:ml-64 p-4 md:p-margin-desktop pb-24">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="glass-panel p-4 relative overflow-hidden"><div class="scanline-overlay absolute inset-0 opacity-10"></div><span class="text-label-caps text-on-surface-variant/60">GLOBAL DEATH COUNT</span><p class="text-headline-md font-data-lg text-primary-container mt-1" data-death-toll>42,069</p></div>
+        <div class="glass-panel p-4 relative overflow-hidden"><div class="scanline-overlay absolute inset-0 opacity-10"></div><span class="text-label-caps text-on-surface-variant/60">ACTIVE BURIALS</span><p class="text-headline-md font-data-lg text-secondary-container mt-1" id="active-burials">0</p></div>
+        <div class="glass-panel p-4"><span class="text-label-caps text-on-surface-variant/60">LAST DECEASE</span><p class="text-headline-md text-on-surface mt-1">0.04s AGO</p></div>
+        <div class="glass-panel p-4"><span class="text-label-caps text-on-surface-variant/60">STABILITY</span><p class="text-headline-md text-error mt-1" id="stability-label">CRITICAL (12%)</p></div>
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-headline-lg uppercase">Repository Analysis</h1>
+          <p class="text-data-sm text-on-surface-variant">Extracting necro-data from: <span class="text-primary-container" id="repo-display">github.com/neo-node/orphaned-lib</span></p>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mb-4">
+        <input id="repo-input" class="flex-1 bg-surface-container-highest px-4 py-2 border-b-2 border-primary text-data-sm" value="github.com/neo-node/orphaned-lib" />
+        <button type="button" id="btn-rescan" class="px-6 py-2 border border-primary-container text-primary-container text-label-caps hover:bg-primary-container hover:text-on-primary">RE-SCAN</button>
+      </div>
+
+      <div class="glass-panel border-2 border-primary-container/20 flex flex-col min-h-[420px]">
+        <div class="flex justify-between px-4 py-2 bg-surface-container-highest border-b border-outline-variant/30">
+          <span class="text-data-sm font-mono text-on-surface-variant">NEURAL_DECODER_BETA_V.9</span>
+          <span class="text-data-sm opacity-40" id="timestamp"></span>
+        </div>
+        <div id="terminal-content" class="flex-1 p-6 font-mono text-data-sm overflow-y-auto min-h-[280px]"></div>
+        <div class="px-6 py-6 border-t border-outline-variant/30 bg-surface-container-low flex flex-col md:flex-row justify-between gap-4 items-center">
+          <div class="space-y-2 text-data-sm text-on-surface-variant">
+            <label class="flex items-center gap-2"><input type="checkbox" checked class="border-primary-container" /> Notify contributors via digital eulogy</label>
+            <label class="flex items-center gap-2"><input type="checkbox" checked class="border-primary-container" /> Mint death certificate as data-log</label>
+          </div>
+          <button type="button" id="btn-bury" disabled class="bg-primary-container text-on-primary-container font-label-caps px-12 py-5 uppercase tracking-widest hover:brightness-110 disabled:opacity-40 shadow-[0_0_20px_rgba(0,255,65,0.3)]">INITIATE_BURIAL</button>
+        </div>
+      </div>
+      <p class="mt-4"><a href="index.html" class="text-data-sm text-primary hover:underline">← Back to graveyard</a></p>
+    </main>
+  </div>
+
+  <footer class="bg-surface-container-lowest border-t border-outline-variant/10 py-4 px-margin-desktop text-data-sm text-on-surface-variant/60">
+    FAILMATE TERMINAL // DEATH_TOLL: <span data-death-toll>42,069</span>
+  </footer>
+
+  <div id="toast" class="hidden fixed bottom-8 right-4 z-[100] glass-panel px-4 py-3"><p class="text-data-sm text-primary" id="toast-message"></p></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/firestore-db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app-init.js"></script>
+  <script src="js/lab.js"></script>
+</body>
+</html>

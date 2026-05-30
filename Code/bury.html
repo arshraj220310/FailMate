@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Failmate // Bury Project</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="bg-background text-on-background font-body-md">
+  <header class="fixed top-0 z-50 w-full h-16 flex justify-between items-center px-4 md:px-margin-desktop bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+    <a href="index.html" class="flex items-center gap-3"><img src="assets/logo.svg" class="h-9 w-9" alt="" /><span class="text-headline-md font-black text-primary-container uppercase">Failmate</span></a>
+    <nav class="hidden md:flex gap-6 text-label-caps">
+      <a href="index.html" class="text-on-surface-variant hover:text-primary">GRAVEYARD</a>
+      <a href="lab.html" class="text-on-surface-variant hover:text-primary">REANIMATION_LAB</a>
+    </nav>
+  </header>
+
+  <main class="pt-24 pb-20 px-4 md:px-margin-desktop max-w-container-max mx-auto">
+    <h1 class="text-headline-lg text-primary uppercase mb-2">Bury Your Project</h1>
+    <p class="text-data-sm text-on-surface-variant mb-8">Submit a failed venture. Optional GitHub autopsy scan.</p>
+
+    <div class="glass-panel p-4 flex gap-3 border-b-2 border-primary mb-6">
+      <span class="material-symbols-outlined text-primary">link</span>
+      <input id="github-url" class="bg-transparent flex-1 border-none focus:ring-0 text-data-sm text-primary" placeholder="github.com/user/dead-project" />
+      <button type="button" id="btn-scan" class="px-4 py-2 bg-primary-container text-on-primary-container text-label-caps hover:opacity-90">AUTO-FILL</button>
+    </div>
+    <div id="scan-log" class="hidden glass-panel p-6 font-mono text-data-sm max-h-48 overflow-y-auto mb-6 border border-primary-container/20"></div>
+
+    <form id="bury-form" class="glass-panel p-8 space-y-6">
+      <div>
+        <label class="text-label-caps text-on-surface-variant/60">PROJECT_NAME</label>
+        <input required name="name" id="f-name" class="w-full mt-1 bg-surface-container-lowest border border-outline-variant/30 px-4 py-3 text-data-lg focus:border-primary-container focus:ring-0" />
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-label-caps text-on-surface-variant/60">CAUSE_OF_DEATH</label>
+          <select name="cause" id="f-cause" class="w-full mt-1 bg-surface-container-lowest border border-outline-variant/30 px-4 py-3 text-data-sm">
+            <option value="NO_PMF">NO_PMF</option>
+            <option value="BURNOUT">BURNOUT</option>
+            <option value="NO_FUNDING">NO_FUNDING</option>
+            <option value="TEAM_SPLIT">TEAM_SPLIT</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-label-caps text-on-surface-variant/60">TECH_CATEGORY</label>
+          <select name="category" id="f-category" class="w-full mt-1 bg-surface-container-lowest border border-outline-variant/30 px-4 py-3 text-data-sm">
+            <option value="AI/ML">AI/ML</option>
+            <option value="WEB3">WEB3</option>
+            <option value="E-COMMERCE">E-COMMERCE</option>
+            <option value="NETWORK">NETWORK</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant/60">TECH_STACK (comma separated)</label>
+        <input name="stack" id="f-stack" class="w-full mt-1 bg-surface-container-lowest border border-outline-variant/30 px-4 py-3 text-data-sm" placeholder="REACT, NODE" />
+      </div>
+      <div>
+        <label class="text-label-caps text-on-surface-variant/60">LAST_WORDS</label>
+        <textarea required name="description" id="f-desc" rows="4" class="w-full mt-1 bg-surface-container-lowest border border-outline-variant/30 px-4 py-3 text-body-md"></textarea>
+      </div>
+      <button type="submit" class="w-full py-5 bg-primary-container text-on-primary-container font-label-caps uppercase tracking-widest hover:brightness-110 shadow-[0_0_20px_rgba(0,255,65,0.3)]">INITIATE_BURIAL</button>
+    </form>
+  </main>
+
+  <div id="toast" class="hidden fixed bottom-8 right-4 z-[100] glass-panel px-4 py-3"><p class="text-data-sm text-primary" id="toast-message"></p></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/firestore-db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app-init.js"></script>
+  <script src="js/bury.js"></script>
+</body>
+</html>
