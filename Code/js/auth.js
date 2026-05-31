@@ -86,7 +86,9 @@ const FailMateAuth = (() => {
   function requireAuth(redirectTo) {
     if (!FailMateFirebase.isEnabled()) return true;
     if (isLoggedIn()) return true;
-    const next = redirectTo || location.pathname.split("/").pop() || "index.html";
+    const file = (redirectTo || location.pathname.split("/").pop() || "index.html").split("?")[0];
+    const qs = location.search || "";
+    const next = redirectTo && redirectTo.includes("?") ? redirectTo : file + qs;
     location.href = `login.html?redirect=${encodeURIComponent(next)}`;
     return false;
   }

@@ -23,7 +23,10 @@
       <div class="h-4 w-px bg-outline-variant/30 hidden md:block"></div>
       <span id="system-log" class="text-data-sm text-primary-container/60 hidden md:block uppercase tracking-widest">System_Log://autopsy</span>
     </div>
-    <a href="dashboard.html" class="text-label-caps text-primary-container border border-primary-container/20 px-3 py-1 glass-panel hover:bg-primary/10">Profile</a>
+    <div class="flex items-center gap-3">
+      <button type="button" id="notif-bell" class="relative material-symbols-outlined text-on-surface-variant hover:text-primary p-1" title="Notifications">notifications</button>
+      <a href="dashboard.html" class="text-label-caps text-primary-container border border-primary-container/20 px-3 py-1 glass-panel hover:bg-primary/10">Profile</a>
+    </div>
     <a id="auth-login-link" href="login.html" class="text-label-caps text-[10px] text-on-surface-variant hover:text-primary ml-2">LOGIN</a>
   </header>
 
@@ -53,12 +56,17 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/firebase-init.js"></script>
   <script src="js/data.js"></script>
   <script src="js/firestore-db.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/work-analyzer.js"></script>
+  <script src="js/revival-team-db.js"></script>
+  <script src="js/notifications-ui.js"></script>
+  <script src="js/loader.js"></script>
   <script src="js/app-init.js"></script>
   <script src="js/autopsy.js"></script>
 </body>

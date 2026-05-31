@@ -24,7 +24,7 @@
     <aside class="hidden md:flex w-64 flex-col border-r border-outline-variant/20 bg-surface-container-low/90 py-gutter shrink-0 fixed left-0 h-full">
       <nav class="px-2 space-y-1">
         <a href="index.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">curtains_closed</span><span class="text-label-caps">GRAVEYARD</span></a>
-        <a href="autopsy.html?id=neuralnet-social" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">biotech</span><span class="text-label-caps">AUTOPSY_LOGS</span></a>
+        <a href="index.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">biotech</span><span class="text-label-caps">AUTOPSY_LOGS</span></a>
         <a href="lab.html" class="text-primary-container bg-primary/5 border-l-4 border-primary-container py-3 px-4 flex gap-3 items-center"><span class="material-symbols-outlined">science</span><span class="text-label-caps">REANIMATION_LAB</span></a>
       </nav>
       <div class="px-4 mt-8"><a href="bury.html" class="block w-full py-4 text-center border border-primary-container text-primary-container text-label-caps hover:bg-primary-container hover:text-on-primary">&gt; BURY_PROJECT</a></div>
@@ -35,19 +35,29 @@
         <div class="glass-panel p-4 relative overflow-hidden"><div class="scanline-overlay absolute inset-0 opacity-10"></div><span class="text-label-caps text-on-surface-variant/60">GLOBAL DEATH COUNT</span><p class="text-headline-md font-data-lg text-primary-container mt-1" data-death-toll>42,069</p></div>
         <div class="glass-panel p-4 relative overflow-hidden"><div class="scanline-overlay absolute inset-0 opacity-10"></div><span class="text-label-caps text-on-surface-variant/60">ACTIVE BURIALS</span><p class="text-headline-md font-data-lg text-secondary-container mt-1" id="active-burials">0</p></div>
         <div class="glass-panel p-4"><span class="text-label-caps text-on-surface-variant/60">LAST DECEASE</span><p class="text-headline-md text-on-surface mt-1">0.04s AGO</p></div>
-        <div class="glass-panel p-4"><span class="text-label-caps text-on-surface-variant/60">STABILITY</span><p class="text-headline-md text-error mt-1" id="stability-label">CRITICAL (12%)</p></div>
+        <div class="glass-panel p-4"><span class="text-label-caps text-on-surface-variant/60">STABILITY</span><p class="text-headline-md text-on-surface-variant mt-1" id="stability-label">—</p></div>
+      </div>
+
+      <div class="info-panel glass-panel p-6 rounded-lg mb-8">
+        <h2 class="text-label-caps text-primary mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-sm">help</span> WHAT IS REANIMATION LAB?</h2>
+        <p class="text-data-sm text-on-surface-variant leading-relaxed max-w-3xl">
+          The <strong class="text-primary-container">Reanimation Lab</strong> is where you <em>diagnose a dead GitHub repo before burying it</em>.
+          Paste a repository URL and the terminal scans commit history, dependencies, and stability — like a pre-burial health check.
+          When analysis finishes, hit <strong class="text-primary">Initiate Burial</strong> to add it to the graveyard as a new failed project.
+          Think of it as: <span class="text-primary">Lab = scan the body</span> → <span class="text-primary">Bury = place in cemetery</span> → <span class="text-primary">Autopsy = read the full report</span>.
+        </p>
       </div>
 
       <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
         <div>
           <h1 class="text-headline-lg uppercase">Repository Analysis</h1>
-          <p class="text-data-sm text-on-surface-variant">Extracting necro-data from: <span class="text-primary-container" id="repo-display">github.com/neo-node/orphaned-lib</span></p>
+          <p class="text-data-sm text-on-surface-variant">Target repository: <span class="text-primary-container" id="repo-display">—</span></p>
         </div>
       </div>
 
       <div class="flex gap-2 mb-4">
-        <input id="repo-input" class="flex-1 bg-surface-container-highest px-4 py-2 border-b-2 border-primary text-data-sm" value="github.com/neo-node/orphaned-lib" />
-        <button type="button" id="btn-rescan" class="px-6 py-2 border border-primary-container text-primary-container text-label-caps hover:bg-primary-container hover:text-on-primary">RE-SCAN</button>
+        <input id="repo-input" type="url" class="flex-1 bg-surface-container-highest px-4 py-2 border-b-2 border-primary text-data-sm" placeholder="github.com/owner/repository" value="" />
+        <button type="button" id="btn-rescan" class="px-6 py-2 border border-primary-container text-primary-container text-label-caps hover:bg-primary-container hover:text-on-primary">SCAN</button>
       </div>
 
       <div class="glass-panel border-2 border-primary-container/20 flex flex-col min-h-[420px]">
@@ -80,9 +90,12 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/firebase-init.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/github-analyzer.js"></script>
   <script src="js/firestore-db.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/notifications-ui.js"></script>
+  <script src="js/loader.js"></script>
   <script src="js/app-init.js"></script>
   <script src="js/lab.js"></script>
 </body>

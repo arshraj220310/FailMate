@@ -20,7 +20,7 @@
       </a>
       <nav class="hidden md:flex gap-6">
         <a data-nav="graveyard" href="index.html" class="text-label-caps font-label-caps h-16 flex items-center px-2">GRAVEYARD</a>
-        <a data-nav="autopsy" href="autopsy.html?id=neuralnet-social" class="text-label-caps font-label-caps h-16 flex items-center px-2">AUTOPSY_LOGS</a>
+        <a data-nav="autopsy" href="index.html" class="text-label-caps font-label-caps h-16 flex items-center px-2" title="Pick a project from the graveyard">AUTOPSY_LOGS</a>
         <a data-nav="lab" href="lab.html" class="text-label-caps font-label-caps h-16 flex items-center px-2">REANIMATION_LAB</a>
       </nav>
     </div>
@@ -29,7 +29,10 @@
         <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
         <input id="search-input" class="bg-transparent border-none focus:ring-0 text-data-sm font-data-sm text-on-surface-variant w-48 placeholder:text-on-surface-variant/50" placeholder="Search corpses..." type="text" />
       </div>
-      <button type="button" id="notif-bell" class="relative material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+      <div class="relative flex items-center">
+        <button type="button" id="notif-bell" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-1" title="Notifications">notifications</button>
+        <span id="notif-dot" class="hidden absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+      </div>
       <a href="dashboard.html" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" title="Dashboard">terminal</a>
       <span id="auth-user" class="hidden lg:inline text-data-sm text-primary-container max-w-[100px] truncate"></span>
       <a id="auth-login-link" href="login.html" class="text-label-caps text-[10px] text-on-surface-variant hover:text-primary px-2">LOGIN</a>
@@ -96,8 +99,9 @@
             TRENDING_CORPSES<span class="w-4 h-10 bg-primary ml-2 cursor-blink"></span>
           </h1>
         </header>
+        <div id="my-revival-banner" class="hidden mb-8"></div>
         <div id="corpse-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-        <p id="empty-msg" class="hidden text-center text-on-surface-variant py-16 font-data-sm">No corpses match your filters.</p>
+        <p id="empty-msg" class="hidden text-center text-on-surface-variant py-16 font-data-sm">The cemetery is empty. <a href="bury.html" class="text-primary underline">Bury your first project</a> or scan a repo in the <a href="lab.html" class="text-primary underline">Reanimation Lab</a>.</p>
         <div class="mt-16 flex justify-center">
           <button type="button" id="load-more" class="group flex items-center gap-4 text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors py-4">
             <span class="h-px w-12 bg-outline-variant group-hover:bg-primary transition-colors"></span>
@@ -145,6 +149,8 @@
   <script src="js/firestore-db.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/notifications-ui.js"></script>
+  <script src="js/loader.js"></script>
   <script src="js/app-init.js"></script>
   <script src="js/graveyard.js"></script>
 </body>

@@ -35,23 +35,26 @@
   <script src="js/firestore-db.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/notifications-ui.js"></script>
+  <script src="js/loader.js"></script>
   <script src="js/app-init.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      await FailMateApp.ready();
-      const ranked = [...getState().projects].sort((a, b) => b.upvotes + b.views * 0.1 - (a.upvotes + a.views * 0.1));
+    document.addEventListener("DOMContentLoaded", () => {
+      FailMateApp.boot(async () => {
+        const ranked = [...getState().projects].sort((a, b) => b.upvotes + b.views * 0.1 - (a.upvotes + a.views * 0.1));
       document.getElementById("leaderboard-table").innerHTML = `
         <div class="grid grid-cols-12 gap-4 p-4 border-b border-outline-variant/30 text-label-caps text-on-surface-variant/60">
           <span class="col-span-1">#</span><span class="col-span-5">CORPSE</span><span class="col-span-2">CAUSE</span><span class="col-span-2">UPVOTES</span><span class="col-span-2">VIEWS</span>
         </div>
         ${ranked.map((p, i) => `
-          <a href="autopsy.html?id=${p.id}" class="grid grid-cols-12 gap-4 p-4 border-b border-outline-variant/10 hover:bg-surface-variant/30 items-center">
+          <a href="autopsy.html?id=${encodeURIComponent(p.id)}" data-autopsy-id="${p.id}" class="grid grid-cols-12 gap-4 p-4 border-b border-outline-variant/10 hover:bg-surface-variant/30 items-center">
             <span class="col-span-1 text-headline-md text-primary-container/40">${i + 1}</span>
             <span class="col-span-5 text-data-lg text-primary font-data-lg">${p.name}</span>
             <span class="col-span-2 text-label-caps text-error">${p.causeOfDeath}</span>
             <span class="col-span-2 text-data-sm">${p.upvotes}</span>
             <span class="col-span-2 text-data-sm text-on-surface-variant">${p.views}</span>
           </a>`).join("")}`;
+      });
     });
   </script>
 </body>

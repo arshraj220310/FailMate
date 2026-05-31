@@ -10,3 +10,6 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "YOUR_SENDER_ID",
   appId: "YOUR_APP_ID",
 };
+
+/** Optional — GitHub personal access token for 5000 API requests/hour (no scopes needed for public repos) */
+const GITHUB_TOKEN = "";

@@ -1,62 +1,89 @@
 let scanDone = false;
+let lastScanResult = null;
+
+function setLabIdle() {
+  scanDone = false;
+  lastScanResult = null;
+  document.getElementById("btn-bury").disabled = true;
+  document.getElementById("stability-label").textContent = "—";
+  document.getElementById("repo-display").textContent = "—";
+  document.getElementById("terminal-content").innerHTML =
+    "<p class='text-on-surface-variant/50'>Paste a GitHub URL above and click SCAN to analyze a repository.</p>";
+}
 
 async function runScan() {
   const url = document.getElementById("repo-input").value.trim();
   const terminal = document.getElementById("terminal-content");
   const btnBury = document.getElementById("btn-bury");
+
+  if (!url) {
+    showToast("Paste a GitHub repository URL first");
+    return;
+  }
+  if (!url.includes("github.com")) {
+    showToast("Enter a valid github.com/owner/repo URL");
+    return;
+  }
+
   scanDone = false;
+  lastScanResult = null;
   btnBury.disabled = true;
-  terminal.innerHTML = "<p class='text-primary-container'>[SYSTEM] Waking neural decoder...</p>";
-  document.getElementById("repo-display").textContent = url.startsWith("http") ? url.replace(/^https?:\/\//, "") : url;
+  terminal.innerHTML = "<p class='text-primary-container'>[SYSTEM] Connecting to GitHub API...</p>";
+  document.getElementById("repo-display").textContent = url.replace(/^https?:\/\//, "");
+  document.getElementById("stability-label").textContent = "SCANNING...";
 
-  const result = await analyzeGithub(url.startsWith("http") ? url : "https://" + url);
-  document.getElementById("stability-label").textContent = `CRITICAL (${result.stability}%)`;
+  try {
+    const result = await analyzeGithub(url.startsWith("http") ? url : "https://" + url);
+    lastScanResult = result;
+    document.getElementById("stability-label").textContent =
+      result.stability >= 50 ? `STABLE (${result.stability}%)` : `CRITICAL (${result.stability}%)`;
 
-  terminal.innerHTML =
-    result.logs.map((l) => `<p class="mb-2 ${l.startsWith("[") ? "text-primary-container/80" : "text-on-surface/60"}">${l}</p>`).join("") +
-    `<p class="mt-4 flex items-center gap-2 text-primary-container">ANALYSIS COMPLETE. READY FOR FINAL DISPOSAL.<span class="w-2 h-5 bg-primary-container cursor-blink"></span></p>`;
+    terminal.innerHTML =
+      result.logs
+        .map((l) => `<p class="mb-2 ${l.startsWith("[") ? "text-primary-container/80" : "text-on-surface/60"}">${l}</p>`)
+        .join("") +
+      `<p class="mt-4 flex items-center gap-2 text-primary-container">ANALYSIS COMPLETE. READY FOR BURIAL.<span class="w-2 h-5 bg-primary-container cursor-blink"></span></p>`;
 
-  scanDone = true;
-  btnBury.disabled = false;
-
-  const extra = [
-    "[LOG] Extracting necro-data from package.json...",
-    "[WARN] Found 'todo' markers from 3 years ago.",
-    "[INFO] Heap dump requested... Success.",
-  ];
-  let i = 0;
-  const iv = setInterval(() => {
-    if (i >= extra.length) return clearInterval(iv);
-    const p = document.createElement("p");
-    p.className = "mb-2 text-on-surface/40";
-    p.textContent = "> " + extra[i++];
-    terminal.appendChild(p);
-    terminal.scrollTop = terminal.scrollHeight;
-  }, 1500);
+    scanDone = true;
+    btnBury.disabled = false;
+  } catch (err) {
+    document.getElementById("stability-label").textContent = "—";
+    terminal.innerHTML = `<p class="text-error">[ERROR] ${err.message}</p>`;
+    showToast(err.message || "GitHub scan failed");
+  }
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await FailMateApp.ready();
-  document.getElementById("timestamp").textContent = "TIMESTAMP: " + new Date().toISOString().replace(/T/, "_").slice(0, 19);
-  document.getElementById("active-burials").textContent = getState().projects.length;
-  renderDeathToll();
-  runScan();
+document.addEventListener("DOMContentLoaded", () => {
+  FailMateApp.boot(async () => {
+    document.getElementById("timestamp").textContent = "TIMESTAMP: " + new Date().toISOString().replace(/T/, "_").slice(0, 19);
+    document.getElementById("active-burials").textContent = getState().projects.length;
+    renderDeathToll();
+    setLabIdle();
 
-  document.getElementById("btn-rescan").addEventListener("click", runScan);
-  document.getElementById("btn-bury").addEventListener("click", () => {
-    if (!scanDone) return;
-    const url = document.getElementById("repo-input").value.trim();
-    const match = url.match(/([^/]+)\/([^/\s]+)/);
-    const name = (match?.[2] || "orphaned-lib").replace(/\.git$/, "");
-    const id = buryProject({
-      name,
-      description: "Flatlined after repository analysis in Reanimation Lab.",
-      causeOfDeath: "NO_PMF",
-      techCategory: "AI/ML",
-      techStack: ["GITHUB"],
-      deceasedDate: "NOW",
-      githubUrl: url,
+    document.getElementById("btn-rescan").addEventListener("click", runScan);
+    document.getElementById("repo-input").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") runScan();
     });
-    if (id) location.href = `autopsy.html?id=${id}`;
+
+    document.getElementById("btn-bury").addEventListener("click", async () => {
+      if (!scanDone || !lastScanResult) return;
+      if (!FailMateAuth.requireAuthForAction("bury from lab")) return;
+
+      const url = document.getElementById("repo-input").value.trim();
+      const gh = lastScanResult.analysis;
+      const id = await buryProject({
+        name: lastScanResult.name || gh.repo,
+        description: lastScanResult.description,
+        causeOfDeath: lastScanResult.causeOfDeath || "NO_PMF",
+        techCategory: lastScanResult.techCategory || "NETWORK",
+        techStack: lastScanResult.techStack || ["GITHUB"],
+        deceasedDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase(),
+        githubUrl: url.startsWith("http") ? url : "https://" + url,
+        githubAnalysis: gh,
+      });
+      const proj = getProject(id);
+      if (proj) navigateToAutopsy(proj);
+      else if (id) location.href = `autopsy.html?id=${encodeURIComponent(id)}`;
+    });
   });
 });

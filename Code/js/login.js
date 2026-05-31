@@ -123,4 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setLoading(false);
     }
   });
+
+  FailMateApp.boot(async () => {}, { skipLoader: false });
 });

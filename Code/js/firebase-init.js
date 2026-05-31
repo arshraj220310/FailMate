@@ -2,6 +2,7 @@ const FailMateFirebase = (() => {
   let app = null;
   let auth = null;
   let db = null;
+  let storage = null;
   let enabled = false;
 
   function isConfigured() {
@@ -26,6 +27,9 @@ const FailMateFirebase = (() => {
     app = firebase.initializeApp(FIREBASE_CONFIG);
     auth = firebase.auth();
     db = firebase.firestore();
+    if (typeof firebase.storage === "function") {
+      storage = firebase.storage();
+    }
     enabled = true;
     return true;
   }
@@ -37,6 +41,7 @@ const FailMateFirebase = (() => {
     getApp: () => app,
     getAuth: () => auth,
     getDb: () => db,
+    getStorage: () => storage,
   };
 })();
 

@@ -33,7 +33,7 @@ If you skip this step, **Google login and all writes will fail**.
 4. Open `FailMate/Code/firestore.rules` in this project, copy **all** of it, paste into the console
 5. Click **Publish**
 
-You should see rules for `projects`, `comments`, `users`, `meta`, and `global` — not the default `allow read, write: if false`.
+You should see rules for `projects`, `comments`, `users`, `meta`, `global`, and **`revivalTeams`** — not the default `allow read, write: if false`.
 
 ### Option B — Firebase CLI
 
@@ -42,8 +42,14 @@ npm install -g firebase-tools
 firebase login
 cd FailMate\Code
 firebase use YOUR_PROJECT_ID
-firebase deploy --only firestore:rules
+firebase deploy --only firestore:rules,storage
 ```
+
+## 4b. Enable Firebase Storage (revival file uploads)
+
+1. **Build** → **Storage** → **Get started** → use default bucket
+2. **Rules** tab → paste all of `storage.rules` from this folder → **Publish**
+3. Revival team uploads go to `revival/{projectId}/...`
 
 ## 5. Add Web App Config
 
@@ -95,7 +101,23 @@ Open `http://localhost:3000/login.html` → register → you're in.
 | `comments/{projectId}` | Mourner comments per project |
 | `users/{uid}` | Karma, burials, notifications, claims per user |
 | `global/terminalLogs` | Live terminal feed on dashboard |
-| `meta/app` | One-time seed flag (loads demo corpses on first run) |
+| `meta/app` | Cemetery version / migration flags |
+| `revivalTeams/{projectId}` | Revival squad: progress %, owner, GitHub URL |
+| `revivalTeams/.../members` | Team members |
+| `revivalTeams/.../joinRequests` | Pending join requests (claimer approves on dashboard) |
+| `revivalTeams/.../messages` | Team chat |
+| `revivalTeams/.../workLogs` | Work updates (adds to revival %) |
+| `revivalTeams/.../files` | Uploaded files + AI scan summary |
+
+## Revival Team Flow
+
+1. User **claims** a project → team auto-created; claimer is owner.
+2. Others **request to join** from autopsy or `revival-team.html`.
+3. Claimer **approves** on dashboard or team room.
+4. Members work on **GitHub branches** (no file uploads) → submit branch/PR → **Notify claimer**.
+5. Claimer invites collaborators on GitHub, reviews PRs, marks **Merged** in Commander tab.
+6. **Notification bell** (top bar) shows join requests, branch reviews, and DMs.
+7. **Private chat** tab for 1-on-1 messages with claimer/teammates.
 
 ## Auth-Protected Actions
 
@@ -103,7 +125,7 @@ Open `http://localhost:3000/login.html` → register → you're in.
 |--------|-------------------------------------|
 | Bury project | Yes |
 | Dashboard | Yes |
-| Upvote / claim / comment | Yes |
+| Upvote / claim / comment / revival team | Yes |
 | Browse graveyard / autopsy | No (public read) |
 
 ## Fallback Mode

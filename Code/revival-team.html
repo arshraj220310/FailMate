@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAILMATE // REVIVAL_TEAM</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="text-on-surface bg-surface-container-lowest">
+  <header class="fixed top-0 z-40 w-full h-16 glass-panel border-b border-outline-variant/30 flex justify-between items-center px-4 md:px-margin-desktop">
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/logo.svg" alt="" class="h-8 w-8" />
+        <span class="text-headline-md font-black text-primary-container uppercase">Failmate</span>
+      </a>
+      <span class="text-data-sm text-primary-container/60 hidden md:block uppercase">Revival_Team://<span id="room-project-code"></span></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="dashboard.html" class="text-label-caps text-primary-container border border-primary-container/20 px-3 py-1 glass-panel hover:bg-primary/10">Dashboard</a>
+    </div>
+  </header>
+
+  <main class="pt-20 pb-12 px-4 md:px-margin-desktop max-w-container-max mx-auto">
+    <div class="mb-6">
+      <p class="text-label-caps text-primary mb-1 flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">groups</span> REVIVAL TEAM ROOM
+        <span id="owner-badge" class="hidden text-[10px] bg-primary/20 px-2 py-0.5 text-primary-container">CLAIMER</span>
+      </p>
+      <h1 id="room-project-name" class="text-headline-lg uppercase"></h1>
+      <a id="repo-link" href="#" target="_blank" rel="noopener" class="hidden text-data-sm text-primary hover:underline mt-1 inline-flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm">code</span> <span id="repo-link-text"></span>
+      </a>
+    </div>
+
+    <div id="room-error" class="hidden text-center py-16 glass-panel">
+      <h2 class="text-headline-md text-error mb-2"></h2>
+      <p class="text-data-sm text-on-surface-variant"></p>
+      <a href="index.html" class="inline-block mt-6 text-label-caps text-primary">← Graveyard</a>
+    </div>
+
+    <div id="room-guest" class="hidden"></div>
+
+    <div id="room-main" class="hidden space-y-6">
+      <section class="glass-panel p-6 border-l-4 border-primary">
+        <div class="flex justify-between text-label-caps text-primary mb-2">
+          <span>REVIVAL PROGRESS</span>
+          <span id="revival-pct">0%</span>
+        </div>
+        <div class="h-3 bg-surface-container-high rounded overflow-hidden">
+          <div id="revival-bar" class="h-full bg-primary-container transition-all duration-500" style="width:0%"></div>
+        </div>
+        <p id="revival-label" class="text-data-sm text-on-surface-variant/70 mt-2"></p>
+      </section>
+
+      <div class="flex flex-wrap gap-2 border-b border-outline-variant/20 pb-2">
+        <button type="button" data-team-tab="chat" class="text-label-caps px-3 py-2 border-b-2 border-primary text-primary">SQUAD</button>
+        <button type="button" data-team-tab="dm" class="text-label-caps px-3 py-2 border-b-2 border-transparent text-on-surface-variant">PRIVATE</button>
+        <button type="button" data-team-tab="github" class="text-label-caps px-3 py-2 border-b-2 border-transparent text-on-surface-variant">GITHUB</button>
+        <button type="button" id="tab-commander" data-team-tab="commander" class="hidden text-label-caps px-3 py-2 border-b-2 border-transparent text-on-surface-variant">COMMANDER</button>
+      </div>
+
+      <div id="panel-chat" data-team-panel class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 glass-panel flex flex-col max-h-[420px]">
+          <div id="chat-messages" class="flex-1 overflow-y-auto p-2 min-h-[240px]"></div>
+          <div class="p-3 border-t border-outline-variant/20 flex gap-2">
+            <input id="chat-input" class="flex-1 bg-transparent border border-outline-variant/30 px-3 py-2 text-data-sm" placeholder="Squad channel…" />
+            <button type="button" id="btn-send-chat" class="px-4 py-2 bg-primary-container text-on-primary-container text-label-caps">SEND</button>
+          </div>
+        </div>
+        <div class="glass-panel p-4 space-y-4">
+          <div>
+            <h3 class="text-label-caps text-primary mb-3">JOIN REQUESTS</h3>
+            <div id="join-requests-inline" class="space-y-3 text-data-sm"></div>
+          </div>
+          <div id="github-username-box" class="border-t border-outline-variant/20 pt-3">
+            <h3 class="text-label-caps text-primary mb-2">YOUR GITHUB</h3>
+            <input id="member-github" class="w-full bg-surface-container-low border border-outline-variant/40 px-2 py-1 text-data-sm mb-2" placeholder="username (no @)" />
+            <button type="button" id="btn-save-github" class="w-full text-label-caps text-[10px] border border-primary-container/40 py-1 text-primary-container">SAVE USERNAME</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-dm" data-team-panel class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass-panel p-4">
+          <h3 class="text-label-caps text-primary mb-3">PRIVATE CHAT</h3>
+          <select id="dm-peer" class="w-full bg-surface-container-low border border-outline-variant/40 px-2 py-2 text-data-sm mb-2"></select>
+          <p class="text-[10px] text-on-surface-variant/50">1-on-1 with claimer or teammates</p>
+        </div>
+        <div class="lg:col-span-2 glass-panel flex flex-col max-h-[420px]">
+          <div id="dm-messages" class="flex-1 overflow-y-auto p-2 min-h-[240px]"></div>
+          <div class="p-3 border-t border-outline-variant/20 flex gap-2">
+            <input id="dm-input" class="flex-1 bg-transparent border border-outline-variant/30 px-3 py-2 text-data-sm" placeholder="Private message…" />
+            <button type="button" id="btn-send-dm" class="px-4 py-2 bg-primary-container text-on-primary-container text-label-caps">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-github" data-team-panel class="hidden space-y-6">
+        <div class="glass-panel p-6 border-l-4 border-secondary">
+          <h3 class="text-label-caps text-primary mb-2">GITHUB WORKFLOW</h3>
+          <ol class="text-data-sm text-on-surface-variant space-y-2 list-decimal list-inside">
+            <li>Save your GitHub username (sidebar).</li>
+            <li>Request collaborator access — claimer invites you on GitHub.</li>
+            <li>Create a branch, commit your fixes, push to your branch.</li>
+            <li>Submit branch details below, then <strong class="text-primary">Notify claimer</strong>.</li>
+            <li>Claimer reviews PR/compare link and merges on GitHub.</li>
+          </ol>
+          <div class="flex flex-wrap gap-2 mt-4">
+            <button type="button" id="btn-request-collab" class="px-4 py-2 bg-primary-container text-on-primary-container text-label-caps">REQUEST COLLABORATOR</button>
+            <a id="btn-open-repo" href="#" target="_blank" rel="noopener" class="px-4 py-2 border border-primary-container text-primary-container text-label-caps">OPEN REPO</a>
+          </div>
+          <p id="collab-status" class="text-data-sm text-primary-container mt-3"></p>
+        </div>
+
+        <div class="glass-panel p-6">
+          <h3 class="text-label-caps text-primary mb-4">SUBMIT BRANCH / PR</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <input id="gh-branch" class="bg-surface-container-low border border-outline-variant/40 px-3 py-2 text-data-sm" placeholder="Branch name e.g. revival-auth-fix" />
+            <input id="gh-pr" class="bg-surface-container-low border border-outline-variant/40 px-3 py-2 text-data-sm" placeholder="Pull request URL (optional)" />
+          </div>
+          <input id="gh-compare" class="w-full mb-3 bg-surface-container-low border border-outline-variant/40 px-3 py-2 text-data-sm" placeholder="Compare URL (optional) github.com/.../compare/main...branch" />
+          <textarea id="gh-summary" rows="3" class="w-full mb-3 bg-surface-container-low border border-outline-variant/40 px-3 py-2 text-data-sm" placeholder="What did you change? (claimers see this in notifications)"></textarea>
+          <textarea id="gh-files" rows="2" class="w-full mb-3 bg-surface-container-low border border-outline-variant/40 px-3 py-2 text-data-sm" placeholder="Files touched e.g. src/auth.js, README.md"></textarea>
+          <button type="button" id="btn-submit-gh" class="px-6 py-2 bg-primary-container text-on-primary-container text-label-caps">SAVE SUBMISSION</button>
+        </div>
+        <div id="github-submissions-list" class="space-y-3"></div>
+      </div>
+
+      <div id="panel-commander" data-team-panel class="hidden">
+        <p class="text-data-sm text-on-surface-variant mb-4">Review GitHub branches, invite collaborators, merge PRs on GitHub, then mark status here.</p>
+        <div id="commander-feed"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="hidden fixed bottom-8 right-4 z-[100] glass-panel border-primary-container/40 px-4 py-3">
+    <p class="text-data-sm text-primary"><span id="toast-message"></span></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/firestore-db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/github-analyzer.js"></script>
+  <script src="js/revival-team-db.js"></script>
+  <script src="js/notifications-ui.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/app-init.js"></script>
+  <script src="js/revival-team.js"></script>
+</body>
+</html>

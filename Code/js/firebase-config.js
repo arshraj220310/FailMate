@@ -15,3 +15,6 @@ const FIREBASE_CONFIG = {
   measurementId: "G-46WWWZVNX0"
 
 };
+
+/** Optional GitHub token — 5000 API req/hour for Lab scans (public repos only) */
+const GITHUB_TOKEN = "";

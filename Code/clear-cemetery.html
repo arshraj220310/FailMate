@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Failmate // Clear Cemetery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center p-4 font-mono">
+  <div class="glass-panel p-8 max-w-md w-full">
+    <h1 class="text-primary text-lg mb-2">CLEAR CEMETERY</h1>
+    <p class="text-data-sm text-on-surface-variant mb-6">Deletes <strong>all</strong> projects and comments from Firebase. You must be logged in. Your user profile (karma, claims) is kept.</p>
+    <button type="button" id="btn-clear" class="w-full py-3 bg-error/20 border border-error text-error text-label-caps hover:bg-error/30 mb-4">DELETE ALL PROJECTS</button>
+    <p id="status" class="text-data-sm text-primary-container min-h-[1.5rem]"></p>
+    <a href="index.html" class="text-data-sm text-primary mt-4 inline-block hover:underline">← Back to graveyard</a>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/firestore-db.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById("btn-clear").addEventListener("click", async () => {
+      const status = document.getElementById("status");
+      status.textContent = "Clearing...";
+      try {
+        if (!FailMateFirebase.isEnabled()) throw new Error("Firebase not configured");
+        await new Promise((r) => FailMateAuth.onReady(r));
+        if (!FailMateAuth.isLoggedIn()) {
+          location.href = "login.html?redirect=clear-cemetery.html";
+          return;
+        }
+        const result = await FailMateDB.clearCemetery();
+        status.textContent = `Done. Removed ${result.projects} projects, ${result.comments} comment docs.`;
+      } catch (e) {
+        status.textContent = "Error: " + e.message;
+      }
+    });
+  </script>
+</body>
+</html>
