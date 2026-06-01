@@ -72,9 +72,9 @@
 
 .toast-host {
   position: fixed;
-  top: 5rem;
+  top: 1rem;
   right: 1rem;
-  z-index: 200;
+  z-index: 999999;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -989,8 +989,8 @@ html.fm-ready header {
 
   /* Toast host position */
   .toast-host {
-    top: 4.5rem;
-    right: 0.75rem;
+    top: 1rem;
+    right: 1rem;
   }
 }
 
@@ -1046,5 +1046,124 @@ html.fm-ready header {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
+}
+
+/* ─── Premium Auth Modal Popup ─── */
+.fm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.fm-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fm-modal-container {
+  width: min(400px, 90vw);
+  background: rgba(20, 24, 20, 0.95);
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(0, 255, 65, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fm-modal-backdrop.open .fm-modal-container {
+  transform: scale(1);
+}
+
+.fm-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.15);
+  padding-bottom: 0.75rem;
+}
+
+.fm-modal-icon {
+  color: #00ff41;
+  font-size: 24px;
+  animation: fm-toast-pulse 1.5s ease-in-out infinite;
+}
+
+.fm-modal-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #00ff41;
+  margin: 0;
+}
+
+.fm-modal-body {
+  font-family: "Inter", sans-serif;
+}
+
+.fm-modal-message {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #ebffe2;
+  margin: 0;
+}
+
+.fm-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid rgba(132, 150, 126, 0.15);
+  padding-top: 0.75rem;
+}
+
+.fm-modal-btn {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.fm-modal-btn-secondary {
+  background: rgba(132, 150, 126, 0.1);
+  border-color: rgba(132, 150, 126, 0.25);
+  color: rgba(235, 255, 226, 0.7);
+}
+
+.fm-modal-btn-secondary:hover {
+  background: rgba(132, 150, 126, 0.2);
+  color: #ebffe2;
+  border-color: rgba(132, 150, 126, 0.4);
+}
+
+.fm-modal-btn-primary {
+  background: rgba(0, 255, 65, 0.1);
+  border-color: rgba(0, 255, 65, 0.4);
+  color: #00ff41;
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.1);
+}
+
+.fm-modal-btn-primary:hover {
+  background: #00ff41;
+  color: #060806;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.35);
 }
 

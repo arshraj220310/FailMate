@@ -83,23 +83,82 @@ const FailMateAuth = (() => {
     location.href = "login.html";
   }
 
+  function escapeHtml(text) {
+    if (text == null) return "";
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function showAuthModal(message, targetUrl, isPageLevel = false) {
+    let backdrop = document.getElementById("fm-auth-modal");
+    if (!backdrop) {
+      backdrop = document.createElement("div");
+      backdrop.id = "fm-auth-modal";
+      backdrop.className = "fm-modal-backdrop";
+      document.body.appendChild(backdrop);
+    }
+
+    backdrop.innerHTML = `
+      <div class="fm-modal-container glass-panel">
+        <div class="fm-modal-header">
+          <span class="material-symbols-outlined fm-modal-icon">security</span>
+          <h3 class="fm-modal-title">AUTHENTICATION REQUIRED</h3>
+        </div>
+        <div class="fm-modal-body">
+          <p class="fm-modal-message">${escapeHtml(message)}</p>
+        </div>
+        <div class="fm-modal-footer">
+          <button type="button" class="fm-modal-btn fm-modal-btn-secondary" id="fm-auth-modal-cancel">CANCEL</button>
+          <button type="button" class="fm-modal-btn fm-modal-btn-primary" id="fm-auth-modal-login">LOG IN</button>
+        </div>
+      </div>
+    `;
+
+    // Force layout reflow to ensure CSS transition classes register immediately
+    backdrop.offsetWidth;
+    backdrop.classList.add("open");
+
+    const cancelBtn = backdrop.querySelector("#fm-auth-modal-cancel");
+    const loginBtn = backdrop.querySelector("#fm-auth-modal-login");
+
+    cancelBtn.addEventListener("click", () => {
+      backdrop.classList.remove("open");
+      setTimeout(() => backdrop.remove(), 300);
+      if (isPageLevel) {
+        const currentFile = location.pathname.split("/").pop() || "index.html";
+        if (currentFile !== "index.html" && currentFile !== "") {
+          location.href = "index.html";
+        }
+      }
+    });
+
+    loginBtn.addEventListener("click", () => {
+      backdrop.classList.remove("open");
+      setTimeout(() => {
+        backdrop.remove();
+        location.href = targetUrl;
+      }, 300);
+    });
+  }
+
   function requireAuth(redirectTo) {
-    if (!FailMateFirebase.isEnabled()) return true;
     if (isLoggedIn()) return true;
     const file = (redirectTo || location.pathname.split("/").pop() || "index.html").split("?")[0];
     const qs = location.search || "";
     const next = redirectTo && redirectTo.includes("?") ? redirectTo : file + qs;
-    location.href = `login.html?redirect=${encodeURIComponent(next)}`;
+    const targetUrl = `login.html?redirect=${encodeURIComponent(next)}`;
+    showAuthModal("You need to sign in to access this page.", targetUrl, true);
     return false;
   }
 
   function requireAuthForAction(actionName) {
-    if (!FailMateFirebase.isEnabled()) return true;
     if (isLoggedIn()) return true;
-    showToast(`Sign in to ${actionName}.`);
-    setTimeout(() => {
-      location.href = `login.html?redirect=${encodeURIComponent(location.pathname.split("/").pop() + location.search)}`;
-    }, 800);
+    const file = location.pathname.split("/").pop() || "index.html";
+    const targetUrl = `login.html?redirect=${encodeURIComponent(file + location.search)}`;
+    showAuthModal(`Sign in to ${actionName}.`, targetUrl, false);
     return false;
   }
 
