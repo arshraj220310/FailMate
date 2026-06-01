@@ -1,6 +1,7 @@
 /** Global notification bell + Firestore inbox sync */
 const FailMateNotify = (() => {
   let unsubInbox = null;
+  let knownInboxIds = null;
 
   function injectNotificationUI() {
     if (!document.getElementById("notif-panel")) {
@@ -40,15 +41,32 @@ const FailMateNotify = (() => {
   function subscribeCurrentUser() {
     if (unsubInbox) unsubInbox();
     unsubInbox = null;
+    knownInboxIds = null;
     const uid = FailMateAuth?.getUser()?.uid;
     if (!uid || !FailMateDB?.isEnabled()) return;
     unsubInbox = FailMateDB.subscribeInbox(uid, (items) => {
+      if (knownInboxIds === null) {
+        knownInboxIds = new Set(items.map((i) => i.id));
+      } else {
+        items
+          .filter((i) => !knownInboxIds.has(i.id) && !i.isRead)
+          .forEach((n) => {
+            if (typeof showToast === "function") {
+              const t = n.type === "accepted" ? "success" : "notification";
+              showToast(n.message, t);
+            }
+            if (n.type === "accepted" && typeof FailMateSidebar !== "undefined") {
+              FailMateSidebar.scheduleRefresh();
+            }
+          });
+        knownInboxIds = new Set(items.map((i) => i.id));
+      }
       setState((s) => {
         const map = new Map();
         [...items, ...(s.notifications || [])].forEach((n) => map.set(n.id, n));
         return { ...s, notifications: Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 80) };
       });
-      if (typeof renderNotificationList === "function") renderNotificationList();
+      renderNotificationList();
     });
   }
 
@@ -65,13 +83,15 @@ const FailMateNotify = (() => {
     list.innerHTML = items
       .map((n) => {
         const typeIcon =
-          n.type === "github"
-            ? "code"
-            : n.type === "join"
-              ? "person_add"
-              : n.type === "dm"
-                ? "forum"
-                : "bolt";
+          n.type === "accepted"
+            ? "celebration"
+            : n.type === "github"
+              ? "code"
+              : n.type === "join"
+                ? "person_add"
+                : n.type === "dm"
+                  ? "forum"
+                  : "bolt";
         return `
         <a href="${escapeHtml(n.link || "#")}" data-notif-id="${escapeHtml(n.id)}" class="notif-item block p-4 hover:bg-surface-variant/20 border-l-2 ${n.isRead ? "border-transparent opacity-70" : "border-primary-container"}">
           <div class="flex gap-2">
@@ -123,14 +143,23 @@ const FailMateNotify = (() => {
       panel?.classList.toggle("hidden");
       const open = panel && !panel.classList.contains("hidden");
       backdrop?.classList.toggle("hidden", !open);
-      if (open) renderNotificationList();
+      if (open) {
+        panel.classList.add("notif-panel-open");
+        setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, isRead: true })) }));
+        persistUserPrivate();
+        renderNotificationList();
+      } else {
+        panel?.classList.remove("notif-panel-open");
+      }
     });
     backdrop?.addEventListener("click", () => {
       panel?.classList.add("hidden");
+      panel?.classList.remove("notif-panel-open");
       backdrop?.classList.add("hidden");
     });
     document.getElementById("notif-close")?.addEventListener("click", () => {
       panel?.classList.add("hidden");
+      panel?.classList.remove("notif-panel-open");
       backdrop?.classList.add("hidden");
     });
     document.getElementById("notif-mark-all")?.addEventListener("click", markAllRead);
@@ -139,7 +168,6 @@ const FailMateNotify = (() => {
   function init() {
     injectNotificationUI();
     bindPanel();
-    initNotifications();
     subscribeCurrentUser();
     renderNotificationList();
   }

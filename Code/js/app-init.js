@@ -20,6 +20,7 @@ const FailMateApp = (() => {
       if (!skipLoader) FailMateLoader.setProgress(70, "Rendering page data...");
       if (typeof renderFn === "function") await renderFn();
       if (typeof FailMateNotify !== "undefined") FailMateNotify.init();
+      if (typeof FailMateSidebar !== "undefined") FailMateSidebar.init();
       if (!skipLoader) {
         FailMateLoader.setProgress(95, "Finalizing display...");
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));

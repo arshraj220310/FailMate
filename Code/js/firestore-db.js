@@ -245,6 +245,48 @@ const FailMateDB = (() => {
     if (!snap.empty) await batch.commit();
   }
 
+  async function syncUserTeams(uid, teams) {
+    await waitForAuthToken();
+    await db().collection("users").doc(uid).set({ revivalTeams: teams }, { merge: true });
+    return teams;
+  }
+
+  async function addTeamMembership(uid, entry) {
+    await waitForAuthToken();
+    const ref = db().collection("users").doc(uid);
+    const snap = await ref.get();
+    const list = snap.exists ? snap.data().revivalTeams || [] : [];
+    const next = [
+      { ...entry, joinedAt: entry.joinedAt || Date.now() },
+      ...list.filter((t) => t.projectId !== entry.projectId),
+    ].slice(0, 25);
+    await ref.set({ revivalTeams: next }, { merge: true });
+    return next;
+  }
+
+  async function addPendingJoinRequest(uid, entry) {
+    await waitForAuthToken();
+    const ref = db().collection("users").doc(uid);
+    const snap = await ref.get();
+    const list = snap.exists ? snap.data().pendingJoinRequests || [] : [];
+    const next = [
+      { ...entry, requestedAt: Date.now() },
+      ...list.filter((p) => p.projectId !== entry.projectId),
+    ].slice(0, 15);
+    await ref.set({ pendingJoinRequests: next }, { merge: true });
+    return next;
+  }
+
+  async function removePendingJoinRequest(uid, projectId) {
+    await waitForAuthToken();
+    const ref = db().collection("users").doc(uid);
+    const snap = await ref.get();
+    if (!snap.exists) return [];
+    const list = (snap.data().pendingJoinRequests || []).filter((p) => p.projectId !== projectId);
+    await ref.set({ pendingJoinRequests: list }, { merge: true });
+    return list;
+  }
+
   function subscribeInbox(uid, onChange) {
     return db()
       .collection("users")
@@ -285,5 +327,9 @@ const FailMateDB = (() => {
     markInboxRead,
     markAllInboxRead,
     subscribeInbox,
+    addTeamMembership,
+    syncUserTeams,
+    addPendingJoinRequest,
+    removePendingJoinRequest,
   };
 })();

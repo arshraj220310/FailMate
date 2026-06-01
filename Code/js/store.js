@@ -10,6 +10,8 @@ function defaultState() {
     comments: {},
     claims: [],
     notifications: [],
+    revivalTeams: [],
+    pendingJoinRequests: [],
     terminalLogs: [
       { user: "@SYSTEM", action: "CLAIMED", target: "#D098", color: "primary" },
       { user: "@User_X", action: "UPVOTED", target: "Crypto-Dust", color: "secondary" },
@@ -110,6 +112,8 @@ async function persistUserPrivate() {
     karma: state.user.karma,
     burials: state.user.burials,
     notifications: state.notifications,
+    revivalTeams: state.revivalTeams || [],
+    pendingJoinRequests: state.pendingJoinRequests || [],
     claims: state.claims,
     activeClaimProjectId: state.activeClaimProjectId || null,
     viewed: state.viewed,
@@ -197,8 +201,12 @@ async function initStore() {
             if (n?.id) map.set(n.id, n);
           });
           state.notifications = Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 80);
+          state.revivalTeams = profile.revivalTeams || [];
+          state.pendingJoinRequests = profile.pendingJoinRequests || [];
         } catch {
           state.notifications = profile.notifications || [];
+          state.revivalTeams = profile.revivalTeams || [];
+          state.pendingJoinRequests = profile.pendingJoinRequests || [];
         }
       } else {
         const username = user.displayName || user.email.split("@")[0].toUpperCase();
@@ -218,6 +226,7 @@ async function initStore() {
   unsubscribeProjects = FailMateDB.subscribeProjects((projects) => {
     setState((s) => ({ ...s, projects }));
     syncActiveClaimFromProjects();
+    if (typeof FailMateSidebar !== "undefined") FailMateSidebar.scheduleRefresh();
   });
 
   storeReady = true;
@@ -261,17 +270,132 @@ async function notifyUser(targetUid, type, message, link) {
     }
   }
   if (typeof FailMateNotify !== "undefined") FailMateNotify.renderNotificationList?.();
+  if (targetUid === me || !targetUid) {
+    const toastType =
+      type === "accepted"
+        ? "success"
+        : type === "join" || type === "github" || type === "dm"
+          ? "notification"
+          : "info";
+    showToast(message, toastType);
+  }
+  if (type === "accepted" && typeof FailMateSidebar !== "undefined") {
+    FailMateSidebar.scheduleRefresh();
+  }
   return notif;
 }
 
-function showToast(message) {
-  const el = document.getElementById("toast");
-  const msg = document.getElementById("toast-message");
-  if (!el || !msg) return;
-  msg.textContent = message;
-  el.classList.remove("hidden");
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => el.classList.add("hidden"), 4000);
+function safeExternalUrl(url) {
+  if (!url) return "";
+  let u = String(url).trim();
+  if (!u) return "";
+  if (/^github\.com\//i.test(u) || (u.includes("github.com") && !/^https?:\/\//i.test(u))) {
+    return normalizeGithubUrl(u) || `https://${u.replace(/^\/+/, "")}`;
+  }
+  if (!/^https?:\/\//i.test(u)) return `https://${u}`;
+  return u;
+}
+
+function normalizeGithubUrl(url) {
+  if (url == null || url === "") return "";
+  let u = String(url).trim();
+  if (!u) return "";
+  u = u.replace(/^git\+https:\/\//i, "https://");
+  if (/^github\.com\//i.test(u)) u = `https://${u}`;
+  if (!/^https?:\/\//i.test(u)) {
+    if (/github\.com/i.test(u)) u = `https://${u.replace(/^\/+/, "")}`;
+    else return "";
+  }
+  try {
+    const parsed = new URL(u);
+    if (!parsed.hostname.replace(/^www\./, "").includes("github.com")) return u;
+    let path = parsed.pathname.replace(/\/+$/, "");
+    const parts = path.split("/").filter(Boolean);
+    if (parts.length >= 2) path = `/${parts[0]}/${parts[1]}`;
+    return `${parsed.protocol}//${parsed.hostname}${path}`;
+  } catch {
+    return u.includes("github.com") && !u.startsWith("http") ? `https://${u}` : u;
+  }
+}
+
+function showToast(message, type = "info") {
+  playNotifySound(type);
+
+  let host = document.getElementById("toast-host");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "toast-host";
+    host.className = "toast-host";
+    host.setAttribute("aria-live", "polite");
+    document.body.appendChild(host);
+  }
+
+  const icons = { info: "terminal", success: "check_circle", error: "error", notification: "notifications" };
+    const toast = document.createElement("div");
+    toast.className = `fm-toast fm-toast-${type}${type === "success" ? " fm-toast-accepted" : ""}`;
+  toast.innerHTML = `
+    <span class="material-symbols-outlined fm-toast-icon">${icons[type] || icons.info}</span>
+    <p class="fm-toast-text">${escapeHtml(message)}</p>
+    <button type="button" class="fm-toast-close material-symbols-outlined" aria-label="Dismiss">close</button>`;
+
+  toast.querySelector(".fm-toast-close")?.addEventListener("click", () => dismissToast(toast));
+  host.prepend(toast);
+  requestAnimationFrame(() => toast.classList.add("fm-toast-visible"));
+
+  const ttl = type === "error" ? 5500 : 4200;
+  const timer = setTimeout(() => dismissToast(toast), ttl);
+  toast._timer = timer;
+}
+
+function dismissToast(toast) {
+  if (!toast || toast._dismissed) return;
+  toast._dismissed = true;
+  clearTimeout(toast._timer);
+  toast.classList.remove("fm-toast-visible");
+  toast.classList.add("fm-toast-exit");
+  setTimeout(() => toast.remove(), 380);
+}
+
+function playNotifySound(type = "info") {
+  try {
+    const ctx = window._fmAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    window._fmAudioCtx = ctx;
+    if (ctx.state === "suspended") ctx.resume();
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const freq = type === "error" ? 420 : type === "success" ? 920 : type === "notification" ? 740 : 660;
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.08, now + 0.06);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+    osc.start(now);
+    osc.stop(now + 0.24);
+
+    if (type === "notification" || type === "success") {
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(freq * 1.25, now + 0.1);
+      gain2.gain.setValueAtTime(0.0001, now + 0.1);
+      gain2.gain.exponentialRampToValueAtTime(0.08, now + 0.12);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+      osc2.start(now + 0.1);
+      osc2.stop(now + 0.3);
+    }
+  } catch {
+    /* audio optional */
+  }
 }
 
 function unreadCount() {
@@ -493,13 +617,14 @@ async function claimProject(id) {
   if (typeof FailMateTeams !== "undefined" && uid && FailMateDB?.isEnabled()) {
     try {
       await FailMateTeams.createTeamForClaim(updated, uid, username);
+      if (typeof FailMateSidebar !== "undefined") FailMateSidebar.scheduleRefresh();
     } catch (e) {
       console.warn("[FailMate] Revival team create:", e.message);
     }
   }
 
   addNotification("claim", `You claimed '${p.name}' to revive`, revivalTeamUrl(id));
-  showToast(`Revival claim registered. Open Revival Team from autopsy or dashboard.`);
+  showToast(`Revival claim registered. Open Revival Team from the left panel.`, "success");
   return true;
 }
 
@@ -555,7 +680,7 @@ async function buryProject(data) {
     techCategory: data.techCategory,
     techStack: data.techStack,
     deceasedDate: data.deceasedDate,
-    githubUrl: data.githubUrl,
+    githubUrl: normalizeGithubUrl(data.githubUrl) || data.githubUrl,
     githubAnalysis: gh,
     buriedBy: username,
     buriedByUid: uid || null,

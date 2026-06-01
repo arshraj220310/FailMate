@@ -32,12 +32,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("room-project-name").textContent = currentProject.name;
     document.getElementById("room-project-code").textContent = currentProject.code || "";
+    const autopsyLink = document.getElementById("sidebar-autopsy-link");
+    if (autopsyLink) autopsyLink.href = `autopsy.html?id=${encodeURIComponent(currentProject.id)}`;
 
     try {
       currentTeam = await FailMateTeams.ensureTeamExists(currentProject);
       if (!currentTeam) {
         showRoomError("TEAM NOT READY", "Could not load revival team.");
         return;
+      }
+      const fixedGh = normalizeGithubUrl(currentTeam.githubUrl || "");
+      if (fixedGh && fixedGh !== currentTeam.githubUrl) {
+        currentTeam.githubUrl = fixedGh;
       }
     } catch (e) {
       showRoomError("TEAM ERROR", e.message);
@@ -75,9 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshGithubSubmissions();
     if (isTeamOwner) renderCommanderPanel();
 
-    if (myMember?.githubUsername) {
-      document.getElementById("member-github").value = myMember.githubUsername;
-    }
+    if (myMember?.githubUsername) syncGithubInputs(myMember.githubUsername);
     updateCollabStatus();
 
     teamUnsub = FailMateTeams.subscribeTeam(currentProjectId, (team) => {
@@ -100,7 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function setupRepoLinks() {
-  const url = currentTeam?.githubUrl || currentProject.githubUrl || currentProject.githubAnalysis?.htmlUrl || "";
+  const url = normalizeGithubUrl(
+    currentTeam?.githubUrl || currentProject.githubUrl || currentProject.githubAnalysis?.htmlUrl || ""
+  );
   const link = document.getElementById("repo-link");
   const text = document.getElementById("repo-link-text");
   const openRepo = document.getElementById("btn-open-repo");
@@ -109,7 +115,10 @@ function setupRepoLinks() {
     link.classList.remove("hidden");
     if (text) text.textContent = url.replace(/^https?:\/\//, "");
   }
-  if (openRepo && url) openRepo.href = url;
+  if (openRepo) {
+    openRepo.href = url || "https://github.com";
+    if (!url) openRepo.classList.add("opacity-50");
+  }
 }
 
 function showRoomError(title, hint) {
@@ -178,14 +187,15 @@ function bindChat() {
   });
   document.getElementById("btn-save-github")?.addEventListener("click", async () => {
     try {
-      const gh = await FailMateTeams.updateMemberGithub(
-        currentProjectId,
-        document.getElementById("member-github").value
-      );
-      showToast(`GitHub username saved: @${gh}`);
-      myMember = { ...myMember, githubUsername: gh };
+      const gh =
+        document.getElementById("member-github")?.value?.trim() ||
+        document.getElementById("member-github-gh")?.value?.trim();
+      const saved = await FailMateTeams.updateMemberGithub(currentProjectId, gh);
+      showToast(`GitHub username saved: @${saved}`, "success");
+      myMember = { ...myMember, githubUsername: saved };
+      syncGithubInputs(saved);
     } catch (e) {
-      showToast(e.message);
+      showToast(e.message, "error");
     }
   });
 }
@@ -276,6 +286,14 @@ async function sendDm() {
   }
 }
 
+function syncGithubInputs(value) {
+  const v = (value || "").replace(/^@/, "");
+  ["member-github", "member-github-gh"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = v;
+  });
+}
+
 function updateCollabStatus() {
   const el = document.getElementById("collab-status");
   if (!el || !myMember) return;
@@ -291,17 +309,29 @@ function updateCollabStatus() {
 }
 
 function bindGithub() {
+  document.getElementById("btn-save-github-gh")?.addEventListener("click", () => {
+    document.getElementById("btn-save-github")?.click();
+  });
   document.getElementById("btn-request-collab")?.addEventListener("click", async () => {
     try {
-      const gh = document.getElementById("member-github")?.value;
-      if (gh) await FailMateTeams.updateMemberGithub(currentProjectId, gh);
-      const r = await FailMateTeams.requestCollaboratorAccess(currentProjectId);
-      showToast("Claimer notified. They should invite you on GitHub.");
+      const ghInput =
+        document.getElementById("member-github-gh")?.value?.trim() ||
+        document.getElementById("member-github")?.value?.trim() ||
+        myMember?.githubUsername ||
+        "";
+      if (!ghInput) {
+        showToast("Type your GitHub username in the field above first.", "error");
+        document.getElementById("member-github-gh")?.focus();
+        return;
+      }
+      const r = await FailMateTeams.requestCollaboratorAccess(currentProjectId, ghInput);
+      showToast("Claimer notified. They should invite you on GitHub.", "success");
       if (r.inviteSettingsUrl) window.open(r.inviteSettingsUrl, "_blank");
-      myMember = { ...myMember, collaboratorStatus: "pending" };
+      myMember = { ...myMember, githubUsername: ghInput.replace(/^@/, ""), collaboratorStatus: "pending" };
+      syncGithubInputs(ghInput);
       updateCollabStatus();
     } catch (e) {
-      showToast(e.message);
+      showToast(e.message, "error");
     }
   });
 
@@ -326,7 +356,7 @@ function bindGithub() {
       refreshProgress();
       window._lastSubmissionId = result?.id;
     } catch (e) {
-      showToast(e.message);
+      showToast(e.message, "error");
     }
   });
 }
@@ -345,8 +375,8 @@ async function refreshGithubSubmissions() {
   el.innerHTML = subs
     .map((s) => {
       const links = [
-        s.prUrl ? `<a href="${escapeHtml(s.prUrl)}" target="_blank" rel="noopener" class="text-label-caps text-primary hover:underline">PR</a>` : "",
-        s.compareUrl ? `<a href="${escapeHtml(s.compareUrl)}" target="_blank" rel="noopener" class="text-label-caps text-primary hover:underline ml-2">COMPARE</a>` : "",
+        s.prUrl ? `<a href="${escapeHtml(safeExternalUrl(s.prUrl))}" target="_blank" rel="noopener" class="text-label-caps text-primary hover:underline">PR</a>` : "",
+        s.compareUrl ? `<a href="${escapeHtml(safeExternalUrl(s.compareUrl))}" target="_blank" rel="noopener" class="text-label-caps text-primary hover:underline ml-2">COMPARE</a>` : "",
       ]
         .filter(Boolean)
         .join("");
@@ -431,10 +461,11 @@ async function renderJoinRequestsPanel() {
       const ghInput = el.querySelector(`.approve-gh[data-uid="${uid}"]`);
       try {
         await FailMateTeams.approveJoin(currentProjectId, uid, ghInput?.value);
-        showToast("Approved. Invite them on GitHub, then mark invited.");
+        showToast("Member approved — they get a notification & sidebar link.", "success");
         teamMembers = await FailMateTeams.getMembers(currentProjectId);
         renderJoinRequestsPanel();
         bindDm();
+        if (typeof FailMateSidebar !== "undefined") FailMateSidebar.scheduleRefresh();
       } catch (e) {
         showToast(e.message);
       }
@@ -460,7 +491,7 @@ async function renderCommanderPanel() {
     FailMateTeams.getGithubSubmissions(currentProjectId),
     FailMateTeams.getMembers(currentProjectId),
   ]);
-  const repoUrl = currentTeam?.githubUrl || "";
+  const repoUrl = normalizeGithubUrl(currentTeam?.githubUrl || "");
   const inviteUrl = FailMateTeams.githubCollaboratorInviteUrl(repoUrl);
 
   const pendingCollab = members.filter((m) => m.role !== "owner" && m.collaboratorStatus === "pending");
@@ -490,8 +521,8 @@ async function renderCommanderPanel() {
         ? subs
             .map((s) => {
               const links = [
-                s.prUrl ? `<a href="${escapeHtml(s.prUrl)}" target="_blank" class="text-primary text-label-caps">View PR</a>` : "",
-                s.compareUrl ? `<a href="${escapeHtml(s.compareUrl)}" target="_blank" class="text-primary text-label-caps ml-2">Compare</a>` : "",
+                s.prUrl ? `<a href="${escapeHtml(safeExternalUrl(s.prUrl))}" target="_blank" class="text-primary text-label-caps">View PR</a>` : "",
+                s.compareUrl ? `<a href="${escapeHtml(safeExternalUrl(s.compareUrl))}" target="_blank" class="text-primary text-label-caps ml-2">Compare</a>` : "",
               ].join("");
               return `
         <div class="glass-panel p-4 mb-3 border-l-2 ${s.notified ? "border-secondary" : "border-outline-variant/30"}">

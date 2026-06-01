@@ -81,8 +81,9 @@ async function renderJoinRequestsInbox() {
       const gh = row?.querySelector(".dash-approve-gh")?.value;
       try {
         await FailMateTeams.approveJoin(claim.id, uid, gh);
-        showToast("Approved — invite them on GitHub from Revival Team → Commander.");
+        showToast("Approved — invite them on GitHub from Revival Team → Commander.", "success");
         renderJoinRequestsInbox();
+        if (typeof FailMateSidebar !== "undefined") FailMateSidebar.scheduleRefresh();
       } catch (e) {
         showToast(e.message);
       }

@@ -11,9 +11,77 @@
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/main.css" />
 </head>
-<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container scanlines has-bottom-nav">
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="fm-drawer-overlay" class="fm-drawer-overlay"></div>
+
+  <!-- Mobile Slide-out Drawer -->
+  <div id="fm-drawer" class="fm-drawer">
+    <div class="fm-drawer-header">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/logo.svg" alt="Failmate" class="h-8 w-8" />
+        <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:900;color:#00ff41;letter-spacing:-0.02em;text-transform:uppercase;">FAILMATE</span>
+      </a>
+      <button type="button" class="fm-drawer-close" id="fm-drawer-close-btn">✕</button>
+    </div>
+    <div class="fm-drawer-body">
+      <div id="fm-drawer-revival-nav"></div>
+
+      <div class="fm-drawer-section-label">Navigation</div>
+      <a href="index.html" class="fm-drawer-nav-link active">
+        <span class="material-symbols-outlined" style="font-size:18px;">curtains_closed</span> Graveyard
+      </a>
+      <a href="lab.html" class="fm-drawer-nav-link">
+        <span class="material-symbols-outlined" style="font-size:18px;">science</span> Reanimation_Lab
+      </a>
+      <a href="dashboard.html" class="fm-drawer-nav-link">
+        <span class="material-symbols-outlined" style="font-size:18px;">terminal</span> Dashboard
+      </a>
+      <a href="leaderboard.html" class="fm-drawer-nav-link">
+        <span class="material-symbols-outlined" style="font-size:18px;">leaderboard</span> Leaderboard
+      </a>
+
+      <div class="fm-drawer-divider"></div>
+      <div class="fm-drawer-section-label">Filters // Cause_of_Death</div>
+      <button type="button" data-filter-cause="BURNOUT" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">local_fire_department</span> BURNOUT
+      </button>
+      <button type="button" data-filter-cause="NO_FUNDING" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">money_off</span> NO_FUNDING
+      </button>
+      <button type="button" data-filter-cause="NO_PMF" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">search_off</span> NO_PMF
+      </button>
+      <button type="button" data-filter-cause="TEAM_SPLIT" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">group_off</span> TEAM_SPLIT
+      </button>
+
+      <div class="fm-drawer-divider"></div>
+      <div class="fm-drawer-section-label">Filters // Tech_Category</div>
+      <button type="button" data-filter-category="AI/ML" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">psychology</span> AI/ML
+      </button>
+      <button type="button" data-filter-category="WEB3" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">currency_bitcoin</span> WEB3
+      </button>
+      <button type="button" data-filter-category="E-COMMERCE" class="filter-btn fm-drawer-nav-link" style="width:100%;background:none;cursor:pointer;border:1px solid transparent;">
+        <span class="material-symbols-outlined" style="font-size:18px;">shopping_cart</span> E-COMMERCE
+      </button>
+
+      <div class="fm-drawer-divider"></div>
+      <a href="bury.html" class="fm-drawer-bury-btn">&gt; BURY_PROJECT</a>
+    </div>
+  </div>
+
   <header class="fixed top-0 z-50 flex justify-between items-center w-full px-4 md:px-margin-desktop h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
-    <div class="flex items-center gap-4 md:gap-8">
+    <div class="flex items-center gap-3 md:gap-8">
+      <!-- Mobile Hamburger -->
+      <button type="button" id="fm-hamburger" class="fm-hamburger" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <a href="index.html" class="flex items-center gap-3">
         <img src="assets/logo.svg" alt="Failmate" class="h-9 w-9" />
         <span class="text-headline-md font-headline-md font-black tracking-tighter text-primary-container uppercase hidden sm:inline">Failmate</span>
@@ -24,7 +92,7 @@
         <a data-nav="lab" href="lab.html" class="text-label-caps font-label-caps h-16 flex items-center px-2">REANIMATION_LAB</a>
       </nav>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
       <div class="hidden lg:flex items-center bg-surface-container-highest/50 border border-outline-variant/30 px-3 py-1.5 rounded-lg">
         <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
         <input id="search-input" class="bg-transparent border-none focus:ring-0 text-data-sm font-data-sm text-on-surface-variant w-48 placeholder:text-on-surface-variant/50" placeholder="Search corpses..." type="text" />
@@ -43,6 +111,14 @@
     </div>
   </header>
 
+  <!-- Mobile search bar (below header) -->
+  <div id="mobile-search-bar" class="fixed top-16 left-0 right-0 z-40 px-4 py-2 bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 md:hidden">
+    <div class="flex items-center bg-surface-container-highest/50 border border-outline-variant/30 px-3 py-2 rounded-lg">
+      <span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
+      <input id="search-input-mobile" class="bg-transparent border-none focus:ring-0 text-data-sm font-data-sm text-on-surface-variant flex-1 ml-2 placeholder:text-on-surface-variant/50" placeholder="Search corpses..." type="text" />
+    </div>
+  </div>
+
   <div id="notif-backdrop" class="fixed inset-0 z-[60] bg-black/40 hidden"></div>
   <div id="notif-panel" class="fixed top-16 right-4 z-[70] w-80 max-h-[70vh] glass-panel hidden flex flex-col">
     <div class="p-3 border-b border-outline-variant/30 flex justify-between">
@@ -52,12 +128,14 @@
     <div id="notif-list" class="overflow-y-auto flex-1"></div>
   </div>
 
-  <div class="flex pt-16 h-screen overflow-hidden pb-16">
+  <!-- Mobile top offset: account for search bar on mobile -->
+  <div class="flex md:pt-16 pt-28 h-screen overflow-hidden pb-16">
     <aside class="hidden md:flex flex-col h-full w-64 bg-surface-container-low/90 backdrop-blur-xl border-r border-outline-variant/20 py-gutter shrink-0">
       <div class="px-6 mb-8">
         <h2 class="text-headline-md font-headline-md text-primary tracking-tighter">FAILMATE</h2>
-        <p class="text-data-sm font-data-sm text-on-surface-variant opacity-60">V.2.0.4-STABLE</p>
+        <p class="text-data-sm font-data-sm text-primary/70 opacity-90">Hackathon build</p>
       </div>
+      <div id="fm-revival-nav" data-fm-sidebar class="px-3 shrink-0"></div>
       <div class="space-y-1 flex-grow overflow-y-auto">
         <div class="text-label-caps font-label-caps px-6 mb-2 text-on-surface-variant/40">FILTERS // CAUSE_OF_DEATH</div>
         <button type="button" data-filter-cause="BURNOUT" class="filter-btn w-full text-left flex items-center gap-3 px-6 py-2 text-on-surface-variant/70 hover:bg-surface-variant/50 hover:text-primary transition-all text-label-caps font-label-caps">
@@ -90,7 +168,7 @@
 
     <main class="flex-grow overflow-y-auto px-4 md:px-margin-desktop py-8 scroll-smooth">
       <div class="max-w-container-max mx-auto">
-        <header class="mb-12">
+        <header class="mb-12 animate-fm-fade-up">
           <div class="flex items-center gap-3 mb-2">
             <span class="h-2 w-2 rounded-full bg-primary-container animate-pulse"></span>
             <span class="text-label-caps font-label-caps text-primary/60 tracking-widest uppercase">Live Cemetery Data Feed</span>
@@ -133,6 +211,30 @@
     </div>
   </footer>
 
+  <!-- Mobile Bottom Navigation -->
+  <nav class="fm-bottom-nav">
+    <a href="index.html" class="fm-bottom-nav-item active">
+      <span class="material-symbols-outlined">curtains_closed</span>
+      <span>Graveyard</span>
+    </a>
+    <a href="lab.html" class="fm-bottom-nav-item">
+      <span class="material-symbols-outlined">science</span>
+      <span>Lab</span>
+    </a>
+    <a href="bury.html" class="fm-bottom-nav-item">
+      <span class="material-symbols-outlined">add_circle</span>
+      <span>Bury</span>
+    </a>
+    <a href="dashboard.html" class="fm-bottom-nav-item">
+      <span class="material-symbols-outlined">terminal</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="leaderboard.html" class="fm-bottom-nav-item">
+      <span class="material-symbols-outlined">leaderboard</span>
+      <span>Ranks</span>
+    </a>
+  </nav>
+
   <div id="toast" class="hidden fixed bottom-20 right-4 z-[100] max-w-sm glass-panel border-primary-container/40 px-4 py-3">
     <p class="text-data-sm text-primary flex items-center gap-2">
       <span class="material-symbols-outlined text-primary-container text-[18px]">terminal</span>
@@ -150,8 +252,51 @@
   <script src="js/auth.js"></script>
   <script src="js/store.js"></script>
   <script src="js/notifications-ui.js"></script>
+  <script src="js/revival-team-db.js"></script>
+  <script src="js/revival-sidebar.js"></script>
   <script src="js/loader.js"></script>
   <script src="js/app-init.js"></script>
   <script src="js/graveyard.js"></script>
+  <script>
+    // Mobile drawer logic
+    const hamburger = document.getElementById('fm-hamburger');
+    const drawer = document.getElementById('fm-drawer');
+    const overlay = document.getElementById('fm-drawer-overlay');
+    const closeBtn = document.getElementById('fm-drawer-close-btn');
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      overlay.classList.add('open');
+      hamburger.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('open');
+      hamburger.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', openDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+
+    // Sync mobile search with desktop search
+    const mobileSearch = document.getElementById('search-input-mobile');
+    const desktopSearch = document.getElementById('search-input');
+    if (mobileSearch && desktopSearch) {
+      mobileSearch.addEventListener('input', (e) => {
+        desktopSearch.value = e.target.value;
+        desktopSearch.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+
+    // Close drawer on nav link click
+    drawer.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('click', () => {
+        if (window.innerWidth < 768) closeDrawer();
+      });
+    });
+  </script>
 </body>
 </html>

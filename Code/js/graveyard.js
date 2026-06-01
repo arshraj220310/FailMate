@@ -52,7 +52,7 @@ function renderCard(p) {
     : "";
 
   return `
-    <div class="corpse-card group relative bg-surface-container-low/40 border border-outline-variant/30 p-6 glass-panel overflow-hidden transition-all hover:border-primary/40 ${isMine ? "border-primary/40 ring-1 ring-primary/20" : ""}">
+    <div class="corpse-card animate-fm-fade-up group relative bg-surface-container-low/40 border border-outline-variant/30 p-6 glass-panel overflow-hidden transition-all hover:border-primary/40 ${isMine ? "border-primary/40 ring-1 ring-primary/20" : ""}">
       <div class="scanline-overlay absolute inset-0 opacity-20"></div>
       <div class="flex justify-between items-start mb-4 relative z-10">
         <div>

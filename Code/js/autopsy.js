@@ -29,7 +29,7 @@ function renderGithubSection(gh) {
     <section class="glass-panel p-6 border-l-4 border-primary-container">
       <h2 class="text-label-caps text-primary mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-sm">code</span> GITHUB_SCAN_REPORT</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-data-sm">
-        <div><span class="text-on-surface-variant/60">REPO</span><p class="text-primary"><a href="${escapeHtml(gh.htmlUrl)}" target="_blank" rel="noopener" class="hover:underline">${escapeHtml(gh.full)}</a></p></div>
+        <div><span class="text-on-surface-variant/60">REPO</span><p class="text-primary"><a href="${escapeHtml(safeExternalUrl(gh.htmlUrl))}" target="_blank" rel="noopener" class="hover:underline">${escapeHtml(gh.full)}</a></p></div>
         <div><span class="text-on-surface-variant/60">STABILITY</span><p>${gh.stability}%</p></div>
         <div><span class="text-on-surface-variant/60">STARS / FORKS</span><p>${gh.stars} / ${gh.forks}</p></div>
         <div><span class="text-on-surface-variant/60">OPEN ISSUES</span><p>${gh.openIssues}</p></div>

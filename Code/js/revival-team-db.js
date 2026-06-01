@@ -28,19 +28,20 @@ const FailMateTeams = (() => {
   }
 
   function parseGithubRepo(url) {
-    if (!url) return null;
+    const normalized = normalizeGithubUrl(url);
+    if (!normalized) return null;
     try {
-      if (typeof GitHubAnalyzer !== "undefined") return GitHubAnalyzer.parseRepoUrl(url);
+      if (typeof GitHubAnalyzer !== "undefined") return GitHubAnalyzer.parseRepoUrl(normalized);
     } catch {
       /* fallback */
     }
-    const m = String(url).match(/github\.com\/([^/\s?#]+)\/([^/\s?#.]+)/i);
+    const m = normalized.match(/github\.com\/([^/\s?#]+)\/([^/\s?#.]+)/i);
     if (!m) return null;
     return { owner: m[1], repo: m[2].replace(/\.git$/, ""), full: `${m[1]}/${m[2].replace(/\.git$/, "")}` };
   }
 
   function githubCollaboratorInviteUrl(repoUrl) {
-    const p = parseGithubRepo(repoUrl);
+    const p = parseGithubRepo(normalizeGithubUrl(repoUrl));
     if (!p) return "https://github.com/settings/repositories";
     return `https://github.com/${p.owner}/${p.repo}/settings/access`;
   }
@@ -82,7 +83,7 @@ const FailMateTeams = (() => {
     try {
       const existing = await ref.get();
       if (existing.exists) return { projectId: project.id, ...existing.data() };
-      const githubUrl = project.githubUrl || project.githubAnalysis?.htmlUrl || "";
+      const githubUrl = normalizeGithubUrl(project.githubUrl || project.githubAnalysis?.htmlUrl || "");
       await ref.set({
         projectId: project.id,
         projectName: project.name,
@@ -101,6 +102,13 @@ const FailMateTeams = (() => {
         collaboratorStatus: "owner",
         joinedAt: Date.now(),
       });
+      if (FailMateDB.isEnabled()) {
+        await FailMateDB.addTeamMembership(ownerUid, {
+          projectId: project.id,
+          projectName: project.name,
+          role: "owner",
+        });
+      }
       return getTeam(project.id);
     } catch (e) {
       throw firestoreError(e);
@@ -140,27 +148,25 @@ const FailMateTeams = (() => {
     const user = currentUser();
     if (!(await isMember(projectId, user.uid))) throw new Error("Join the team first.");
     const clean = (githubUsername || "").trim().replace(/^@/, "");
-    if (!clean) throw new Error("Enter your GitHub username.");
+    if (!clean) throw new Error("Enter your GitHub username (no @).");
     await teamRef(projectId).collection("members").doc(user.uid).set({ githubUsername: clean }, { merge: true });
     return clean;
   }
 
-  async function requestCollaboratorAccess(projectId) {
+  async function requestCollaboratorAccess(projectId, githubUsernameFromForm) {
     await waitAuth();
     const user = currentUser();
     const memberRef = teamRef(projectId).collection("members").doc(user.uid);
     const snap = await memberRef.get();
     if (!snap.exists) throw new Error("You must be an approved team member.");
-    const gh = snap.data().githubUsername;
-    if (!gh) throw new Error("Set your GitHub username first.");
 
-    await memberRef.set(
-      { collaboratorStatus: "pending", collaboratorRequestedAt: Date.now() },
-      { merge: true }
-    );
+    let gh = (githubUsernameFromForm || snap.data().githubUsername || "").trim().replace(/^@/, "");
+    if (!gh) throw new Error("Enter your GitHub username in the field above, then click Request Collaborator.");
+
+    await memberRef.set({ githubUsername: gh, collaboratorStatus: "pending", collaboratorRequestedAt: Date.now() }, { merge: true });
 
     const team = await getTeam(projectId);
-    const repoUrl = team?.githubUrl || "";
+    const repoUrl = normalizeGithubUrl(team?.githubUrl || "");
     await notifyUser(
       team.ownerUid,
       "github",
@@ -236,6 +242,15 @@ const FailMateTeams = (() => {
       `${username}${gh ? ` (@${gh})` : ""} wants to join revival: ${team.projectName}`,
       revivalTeamUrl(projectId)
     );
+
+    if (FailMateDB.isEnabled()) {
+      const pending = await FailMateDB.addPendingJoinRequest(user.uid, {
+        projectId,
+        projectName: team.projectName,
+      });
+      setState((s) => ({ ...s, pendingJoinRequests: pending }));
+    }
+    if (typeof FailMateSidebar !== "undefined") FailMateSidebar.scheduleRefresh();
     return true;
   }
 
@@ -275,12 +290,29 @@ const FailMateTeams = (() => {
     });
 
     const team = await getTeam(projectId);
+    const teamUrl = revivalTeamUrl(projectId);
+
     await notifyUser(
       requestUid,
-      "join",
-      `Accepted to revival team "${team.projectName}". Set up GitHub access and start a branch.`,
-      revivalTeamUrl(projectId)
+      "accepted",
+      `You're in! Accepted to "${team.projectName}" — open Revival Team to collaborate.`,
+      teamUrl
     );
+
+    if (FailMateDB.isEnabled()) {
+      const teams = await FailMateDB.addTeamMembership(requestUid, {
+        projectId,
+        projectName: team.projectName,
+        role: "member",
+        justAccepted: true,
+      });
+      const pending = await FailMateDB.removePendingJoinRequest(requestUid, projectId);
+      setState((s) => ({ ...s, revivalTeams: teams, pendingJoinRequests: pending }));
+    }
+    if (typeof FailMateSidebar !== "undefined") {
+      FailMateSidebar.markTeamAccepted(projectId);
+      FailMateSidebar.scheduleRefresh();
+    }
     return true;
   }
 
@@ -291,6 +323,12 @@ const FailMateTeams = (() => {
       status: "rejected",
       resolvedAt: Date.now(),
     });
+    if (FailMateDB.isEnabled()) {
+      const pending = await FailMateDB.removePendingJoinRequest(requestUid, projectId);
+      setState((s) => ({ ...s, pendingJoinRequests: pending }));
+    }
+    await notifyUser(requestUid, "join", `Your join request was declined. Try another revival project.`, "index.html");
+    if (typeof FailMateSidebar !== "undefined") FailMateSidebar.scheduleRefresh();
     return true;
   }
 
@@ -505,6 +543,66 @@ const FailMateTeams = (() => {
     });
   }
 
+  /** Merge profile teams + live Firestore membership scan (claimed projects). */
+  async function discoverUserTeams(uid) {
+    if (!uid || !FailMateDB.isEnabled()) return getState().revivalTeams || [];
+
+    const map = new Map();
+
+    function add(entry) {
+      if (!entry?.projectId) return;
+      const prev = map.get(entry.projectId);
+      map.set(entry.projectId, { ...prev, ...entry, projectId: entry.projectId });
+    }
+
+    try {
+      const profile = await FailMateDB.loadUserProfile(uid);
+      (profile?.revivalTeams || []).forEach(add);
+    } catch {
+      (getState().revivalTeams || []).forEach(add);
+    }
+
+    const active = getActiveClaimProject();
+    if (active && isClaimOwnedByUser(active)) {
+      add({
+        projectId: active.id,
+        projectName: active.name,
+        role: "owner",
+      });
+    }
+
+    const claimed = getState().projects.filter((p) => p.claimedBy);
+    await Promise.all(
+      claimed.slice(0, 40).map(async (p) => {
+        try {
+          if (await isMember(p.id, uid)) {
+            const team = await getTeam(p.id);
+            add({
+              projectId: p.id,
+              projectName: p.name || team?.projectName || p.id,
+              role: team?.ownerUid === uid ? "owner" : "member",
+            });
+          }
+        } catch {
+          /* skip */
+        }
+      })
+    );
+
+    const merged = Array.from(map.values()).sort((a, b) => (b.joinedAt || 0) - (a.joinedAt || 0));
+
+    if (merged.length && FailMateDB.isEnabled()) {
+      try {
+        await FailMateDB.syncUserTeams(uid, merged);
+        setState((s) => ({ ...s, revivalTeams: merged }));
+      } catch {
+        setState((s) => ({ ...s, revivalTeams: merged }));
+      }
+    }
+
+    return merged;
+  }
+
   return {
     getTeam,
     createTeamForClaim,
@@ -534,5 +632,6 @@ const FailMateTeams = (() => {
     getWorkLogs,
     recalculateProgress,
     subscribeTeam,
+    discoverUserTeams,
   };
 })();

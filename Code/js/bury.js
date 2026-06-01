@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .map((s) => s.trim().toUpperCase())
           .filter(Boolean),
         deceasedDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase(),
-        githubUrl: document.getElementById("github-url").value.trim() || undefined,
+        githubUrl: normalizeGithubUrl(document.getElementById("github-url").value.trim()) || undefined,
         githubAnalysis: lastScanResult?.analysis || null,
       });
       const proj = getProject(id);

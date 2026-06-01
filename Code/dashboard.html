@@ -34,7 +34,8 @@
 
   <div class="flex pt-16 min-h-screen pb-16">
     <aside class="hidden md:flex w-64 flex-col border-r border-outline-variant/20 bg-surface-container-low/90 py-gutter shrink-0">
-      <nav class="space-y-1 px-2">
+      <div id="fm-revival-nav" data-fm-sidebar class="px-3 mb-4 shrink-0"></div>
+      <nav class="space-y-1 px-2 flex-1 overflow-y-auto">
         <a href="index.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">curtains_closed</span><span class="text-label-caps">GRAVEYARD</span></a>
         <a href="lab.html" class="text-on-surface-variant py-3 px-4 flex gap-3 items-center hover:bg-surface-variant/50"><span class="material-symbols-outlined">science</span><span class="text-label-caps">REANIMATION_LAB</span></a>
       </nav>
@@ -103,6 +104,7 @@
   <script src="js/work-analyzer.js"></script>
   <script src="js/revival-team-db.js"></script>
   <script src="js/notifications-ui.js"></script>
+  <script src="js/revival-sidebar.js"></script>
   <script src="js/loader.js"></script>
   <script src="js/app-init.js"></script>
   <script src="js/dashboard.js"></script>
