@@ -1,7 +1,4 @@
-/**
- * Real GitHub REST API analyzer for Reanimation Lab & Bury page.
- * Optional: set GITHUB_TOKEN in firebase-config.js for 5000 req/hour (else 60/hour).
- */
+
 const GitHubAnalyzer = (() => {
   const API = "https://api.github.com";
 

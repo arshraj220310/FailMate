@@ -1,4 +1,4 @@
-/** Client-side work analysis for uploaded revival files (no paid AI API). */
+
 const WorkAnalyzer = (() => {
   const CODE_EXT = [".js", ".ts", ".tsx", ".jsx", ".py", ".java", ".go", ".rs", ".html", ".css", ".json", ".md", ".txt", ".yml", ".yaml"];
 

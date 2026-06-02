@@ -130,7 +130,7 @@ async function renderActiveRevival() {
       const team = await FailMateTeams.getTeam(claim.id);
       if (team?.revivalProgress != null) pct = team.revivalProgress;
     } catch {
-      /* use local pct */
+      
     }
   }
 

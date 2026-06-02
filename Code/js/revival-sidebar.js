@@ -1,4 +1,4 @@
-/** Left-panel revival navigation — teams, pending requests, quick links */
+
 const FailMateSidebar = (() => {
   let refreshTimer = null;
 
@@ -25,7 +25,7 @@ const FailMateSidebar = (() => {
         if (profile?.pendingJoinRequests?.length) pending = profile.pendingJoinRequests;
         setState((s) => ({ ...s, pendingJoinRequests: pending }));
       } catch {
-        /* use local */
+        
       }
     }
 

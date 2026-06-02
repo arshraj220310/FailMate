@@ -394,7 +394,7 @@ function playNotifySound(type = "info") {
       osc2.stop(now + 0.3);
     }
   } catch {
-    /* audio optional */
+    
   }
 }
 
@@ -422,11 +422,11 @@ function cacheProjectLocally(project) {
     sessionStorage.setItem(`failmate_project_${project.id}`, JSON.stringify(project));
     sessionStorage.setItem("failmate_autopsy_view", JSON.stringify(project));
   } catch {
-    /* ignore quota errors */
+    
   }
 }
 
-/** Open autopsy with full project data (does not rely on Firebase lookup). */
+
 function navigateToAutopsy(project) {
   if (!project?.id) return;
   cacheProjectLocally(project);
@@ -442,14 +442,14 @@ function loadAutopsyFromSession(id) {
       if (!want || normalizeProjectId(p.id) === want) return p;
     }
   } catch {
-    /* ignore */
+    
   }
   if (want) {
     try {
       const raw = sessionStorage.getItem(`failmate_project_${want}`);
       if (raw) return JSON.parse(raw);
     } catch {
-      /* ignore */
+      
     }
   }
   return null;
@@ -487,7 +487,7 @@ function mergeProjectIntoState(project) {
   });
 }
 
-/** Find project in memory, session cache, or Firestore (with short retry after burial). */
+
 async function resolveProject(id) {
   const want = normalizeProjectId(id);
   if (!want) return null;
@@ -504,7 +504,7 @@ async function resolveProject(id) {
       if (p) return p;
     }
   } catch {
-    /* ignore */
+    
   }
 
   if (FailMateDB?.isEnabled()) {
@@ -753,7 +753,7 @@ function saveRevivalTeamProjectId(id) {
   if (pid) sessionStorage.setItem(REVIVAL_TEAM_SESSION_KEY, pid);
 }
 
-/** Resolve project id for revival-team.html from URL, session, or active claim. */
+
 function getRevivalTeamProjectId() {
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get("id") || params.get("projectId") || params.get("project");
@@ -766,7 +766,7 @@ function getRevivalTeamProjectId() {
     const stored = sessionStorage.getItem(REVIVAL_TEAM_SESSION_KEY);
     if (stored) return normalizeProjectId(stored);
   } catch {
-    /* ignore */
+    
   }
   const active = getActiveClaimProject();
   if (active?.id) {
@@ -794,7 +794,7 @@ function initRevivalTeamLinkClicks() {
         const id = url.searchParams.get("id");
         if (id) saveRevivalTeamProjectId(id);
       } catch {
-        /* ignore */
+        
       }
     },
     true

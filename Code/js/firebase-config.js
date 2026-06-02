@@ -16,5 +16,5 @@ const FIREBASE_CONFIG = {
 
 };
 
-/** Optional GitHub token — 5000 API req/hour for Lab scans (public repos only) */
+
 const GITHUB_TOKEN = "";

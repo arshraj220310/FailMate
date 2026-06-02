@@ -1,4 +1,4 @@
-/** Global notification bell + Firestore inbox sync */
+
 const FailMateNotify = (() => {
   let unsubInbox = null;
   let knownInboxIds = null;

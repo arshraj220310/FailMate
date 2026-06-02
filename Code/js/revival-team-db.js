@@ -33,7 +33,7 @@ const FailMateTeams = (() => {
     try {
       if (typeof GitHubAnalyzer !== "undefined") return GitHubAnalyzer.parseRepoUrl(normalized);
     } catch {
-      /* fallback */
+      
     }
     const m = normalized.match(/github\.com\/([^/\s?#]+)\/([^/\s?#.]+)/i);
     if (!m) return null;
@@ -543,7 +543,7 @@ const FailMateTeams = (() => {
     });
   }
 
-  /** Merge profile teams + live Firestore membership scan (claimed projects). */
+  
   async function discoverUserTeams(uid) {
     if (!uid || !FailMateDB.isEnabled()) return getState().revivalTeams || [];
 
@@ -584,7 +584,7 @@ const FailMateTeams = (() => {
             });
           }
         } catch {
-          /* skip */
+          
         }
       })
     );

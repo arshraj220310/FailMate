@@ -117,7 +117,7 @@ const FailMateAuth = (() => {
       </div>
     `;
 
-    // Force layout reflow to ensure CSS transition classes register immediately
+    
     backdrop.offsetWidth;
     backdrop.classList.add("open");
 

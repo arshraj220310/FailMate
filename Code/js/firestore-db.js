@@ -42,7 +42,7 @@ const FailMateDB = (() => {
     return deleted;
   }
 
-  /** Wipe all projects + comments from Firestore (your burials only after this). */
+  
   async function clearCemetery() {
     await waitForAuthToken();
     const p = await deleteCollection("projects");
@@ -95,13 +95,13 @@ const FailMateDB = (() => {
         });
         await db().doc(TERMINAL_DOC).set({ logs: [] });
       } catch {
-        /* read-only guest — meta created on first login */
+        
       }
     }
     await migrateCemeteryIfNeeded();
   }
 
-  /** Called when user is logged in — ensures demo data is wiped once. */
+  
   async function initDatabaseAfterAuth() {
     await migrateCemeteryIfNeeded();
   }

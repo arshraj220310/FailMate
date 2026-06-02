@@ -228,7 +228,7 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-/* Boot loader — body hidden until fm-ready */
+
 html:not(.fm-ready) body > :not(#fm-loader) {
   visibility: hidden;
 }
@@ -453,7 +453,7 @@ html:not(.fm-ready) body > :not(#fm-loader) {
   color: #00ff41;
 }
 
-/* ─── Custom cursor (terminal crosshair) ─── */
+
 html.fm-ready,
 html.fm-ready body {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='3' fill='%2300ff41' fill-opacity='0.9'/%3E%3Cpath stroke='%2300ff41' stroke-width='1.2' d='M12 2v4M12 18v4M2 12h4M18 12h4'/%3E%3C/svg%3E")
@@ -481,7 +481,7 @@ html.fm-ready textarea {
   cursor: text;
 }
 
-/* ─── Page & panel motion ─── */
+
 html.fm-ready body {
   animation: fm-page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -546,7 +546,7 @@ button:active:not(:disabled) {
   }
 }
 
-/* ─── Revival left nav ─── */
+
 .fm-revival-nav {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
@@ -687,7 +687,7 @@ html.fm-ready header {
   }
 }
 
-/* ─── Mobile Hamburger Button ─── */
+
 .fm-hamburger {
   display: none;
   flex-direction: column;
@@ -736,7 +736,7 @@ html.fm-ready header {
   }
 }
 
-/* ─── Mobile Drawer Overlay ─── */
+
 .fm-drawer-overlay {
   display: none;
   position: fixed;
@@ -754,7 +754,7 @@ html.fm-ready header {
   opacity: 1;
 }
 
-/* ─── Mobile Slide-out Drawer ─── */
+
 .fm-drawer {
   position: fixed;
   top: 0;
@@ -876,7 +876,7 @@ html.fm-ready header {
   background: rgba(0, 255, 65, 0.1);
 }
 
-/* ─── Mobile Bottom Navigation ─── */
+
 .fm-bottom-nav {
   display: none;
   position: fixed;
@@ -934,19 +934,19 @@ html.fm-ready header {
   color: #00ff41;
 }
 
-/* ─── Mobile page body padding (for bottom nav) ─── */
+
 @media (max-width: 767px) {
   body.has-bottom-nav {
     padding-bottom: 56px;
   }
 
-  /* Hide desktop footer on mobile when bottom nav is shown */
+  
   body.has-bottom-nav footer {
     display: none;
   }
 }
 
-/* ─── Mobile search bar ─── */
+
 @media (max-width: 767px) {
   #mobile-search-bar {
     display: flex;
@@ -957,44 +957,44 @@ html.fm-ready header {
   display: none;
 }
 
-/* ─── Responsive fixes: index.html ─── */
+
 @media (max-width: 767px) {
-  /* Stack the main layout on mobile */
+  
   .fm-page-layout {
     padding-bottom: 56px;
   }
 
-  /* Fix notification panel on mobile */
+  
   #notif-panel {
     width: calc(100vw - 2rem);
     right: 1rem;
     left: 1rem;
   }
 
-  /* Headline size on small screens */
+  
   .text-headline-lg {
     font-size: 22px !important;
     line-height: 28px !important;
   }
 
-  /* Lab page stats grid */
+  
   .lab-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* Dashboard ml-64 fix */
+  
   .md\:ml-64 {
     margin-left: 0 !important;
   }
 
-  /* Toast host position */
+  
   .toast-host {
     top: 1rem;
     right: 1rem;
   }
 }
 
-/* ─── Leaderboard mobile fix ─── */
+
 @media (max-width: 639px) {
   .leaderboard-row {
     grid-template-columns: 1.5rem 1fr auto !important;
@@ -1006,7 +1006,7 @@ html.fm-ready header {
   }
 }
 
-/* ─── Revival team tab overflow fix ─── */
+
 @media (max-width: 767px) {
   .fm-team-tabs {
     overflow-x: auto;
@@ -1019,28 +1019,28 @@ html.fm-ready header {
   }
 }
 
-/* ─── Bury form grid fix ─── */
+
 @media (max-width: 767px) {
   .bury-grid-2 {
     grid-template-columns: 1fr !important;
   }
 }
 
-/* ─── Fix header items on mobile ─── */
+
 @media (max-width: 639px) {
   .fm-header-user-info {
     display: none !important;
   }
 }
 
-/* ─── Autopsy page mobile ─── */
+
 @media (max-width: 767px) {
   .autopsy-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
-/* ─── Smooth page padding for mobile ─── */
+
 @media (max-width: 767px) {
   main {
     padding-left: 1rem !important;
@@ -1048,7 +1048,7 @@ html.fm-ready header {
   }
 }
 
-/* ─── Premium Auth Modal Popup ─── */
+
 .fm-modal-backdrop {
   position: fixed;
   inset: 0;

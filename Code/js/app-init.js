@@ -6,7 +6,7 @@ const FailMateApp = (() => {
     return storeInitPromise;
   }
 
-  /** Show loader → load store → run page render → hide loader only when data is on screen. */
+  
   async function boot(renderFn, options = {}) {
     const { skipLoader = false } = options;
     if (!skipLoader && typeof FailMateLoader !== "undefined") {
